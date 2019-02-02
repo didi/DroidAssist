@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE DroidAssist [<!ELEMENT DroidAssist ((Global?|Replace?|Insert?|Around?|Enhance?)?,(Global?|Replace?|Insert?|Around?|Enhance?)?,(Global?|Replace?|Insert?|Around?|Enhance?)?,(Global?|Replace?|Insert?|Around?|Enhance?)?,(Global?|Replace?|Insert?|Around?|Enhance?)?)><!ELEMENT Filter     (Include*|Exclude*)*><!ELEMENT Include    (#PCDATA)><!ELEMENT Exclude    (#PCDATA)><!ELEMENT Source             (#PCDATA)><!ELEMENT Target             (#PCDATA)><!ELEMENT TargetBefore            (#PCDATA)><!ELEMENT TargetAfter             (#PCDATA)><!ELEMENT Exception             (#PCDATA)><!ELEMENT MethodCall         (Source,(Target?|(TargetBefore?,TargetAfter?)),Filter?)><!ELEMENT MethodExecution         (Source,(Target?|(TargetBefore?,TargetAfter?)),Filter?)><!ELEMENT ConstructorCall         (Source,(Target?|(TargetBefore?,TargetAfter?)),Filter?)><!ELEMENT ConstructorExecution         (Source,(Target?|(TargetBefore?,TargetAfter?)),Filter?)><!ELEMENT InitializerExecution         (Source,(Target?|(TargetBefore?,TargetAfter?)),Filter?)><!ELEMENT FieldRead         (Source,(Target?|(TargetBefore?,TargetAfter?)),Filter?)><!ELEMENT FieldWrite         (Source,(Target?|(TargetBefore?,TargetAfter?)),Filter?)><!ELEMENT BeforeMethodCall    (Source,Target,Filter?)><!ELEMENT AfterMethodCall    (Source,Target,Filter?)><!ELEMENT BeforeMethodExecution    (Source,Target,Filter?)><!ELEMENT AfterMethodExecution    (Source,Target,Filter?)><!ELEMENT BeforeConstructorCall    (Source,Target,Filter?)><!ELEMENT AfterConstructorCall    (Source,Target,Filter?)><!ELEMENT BeforeConstructorExecution    (Source,Target,Filter?)><!ELEMENT AfterConstructorExecution    (Source,Target,Filter?)><!ELEMENT BeforeInitializerExecution    (Source,Target,Filter?)><!ELEMENT AfterInitializerExecution    (Source,Target,Filter?)><!ELEMENT BeforeFieldRead    (Source,Target,Filter?)><!ELEMENT AfterFieldRead    (Source,Target,Filter?)><!ELEMENT BeforeFieldWrite    (Source,Target,Filter?)><!ELEMENT AfterFieldWrite    (Source,Target,Filter?)><!ELEMENT TryCatchMethodCall    (Source,Exception?,Target,Filter?)><!ELEMENT TryCatchMethodExecution    (Source,Exception?,Target,Filter?)><!ELEMENT TryCatchConstructorCall    (Source,Exception?,Target,Filter?)><!ELEMENT TryCatchConstructorExecution    (Source,Exception?,Target,Filter?)><!ELEMENT TryCatchInitializerExecution    (Source,Exception?,Target,Filter?)><!ELEMENT TimingMethodCall    (Source,Target,Filter?)><!ELEMENT TimingMethodExecution    (Source,Target,Filter?)><!ELEMENT TimingConstructorCall    (Source,Target,Filter?)><!ELEMENT TimingConstructorExecution    (Source,Target,Filter?)><!ELEMENT TimingInitializerExecution    (Source,Target,Filter?)><!ELEMENT Global     (Filter?)><!ELEMENT Replace    (MethodCall*|MethodExecution*|ConstructorCall*|ConstructorExecution*|InitializerExecution*|FieldRead*|FieldWrite*)*><!ELEMENT Around     (MethodCall*|MethodExecution*|ConstructorCall*|ConstructorExecution*|InitializerExecution*|FieldRead*|FieldWrite*)*><!ELEMENT Insert     (BeforeMethodCall*|AfterMethodCall*|BeforeMethodExecution*|AfterMethodExecution*|BeforeConstructorCall*|AfterConstructorCall*|BeforeConstructorExecution*|AfterConstructorExecution*|BeforeInitializerExecution*|AfterInitializerExecution*|BeforeFieldRead*|AfterFieldRead*|BeforeFieldWrite*|AfterFieldWrite*)*><!ELEMENT Enhance    (TryCatchMethodCall*|TryCatchMethodExecution*|TryCatchConstructorCall*|TryCatchConstructorExecution*|TryCatchInitializerExecution*|TimingMethodCall*|TimingMethodExecution*|TimingConstructorCall*|TimingConstructorExecution*|TimingInitializerExecution)*><!ATTLIST Source extend (true|false) "true">]>
+<DroidAssist>
+    <Global>
+        <Filter>
+            <Include>*</Include>
+            <!--<Exclude>android.*</Exclude>-->
+            <!--<Exclude>com.android.*</Exclude>-->
+        </Filter>
+    </Global>
+
+
+    <Replace>
+
+        <MethodCall>
+            <Source extend="false">
+                int android.util.Log.d(java.lang.String,java.lang.String)
+            </Source>
+            <Target>
+                com.didichuxing.tools.test.LogUtils.log($$);
+            </Target>
+            <Filter>
+                <Include>*</Include>
+                <Exclude>com.didichuxing.tools.test.Utils</Exclude>
+                <!--<Exclude>android.*</Exclude>-->
+                <!--<Exclude>com.android.*</Exclude>-->
+            </Filter>
+        </MethodCall>
+
+        <MethodExecution>
+            <Source>
+                void com.didichuxing.tools.test.ExampleSpec.run()
+            </Source>
+            <Target>
+                java.lang.System.out.println("test");
+            </Target>
+        </MethodExecution>
+
+        <ConstructorCall>
+            <Source>new com.didichuxing.tools.test.ExampleSpec(int)</Source>
+            <Target>{$_= com.didichuxing.tools.test.ExampleSpec.getInstance();}</Target>
+        </ConstructorCall>
+
+        <ConstructorExecution>
+            <Source>new com.didichuxing.tools.test.ExampleSpec(int)</Source>
+            <Target>{this();java.lang.System.out.println("test");}</Target>
+        </ConstructorExecution>
+
+        <InitializerExecution>
+            <Source>com.didichuxing.tools.test.ExampleSpec</Source>
+            <Target>
+                {name = "test replace";instance = new
+                com.didichuxing.tools.test.ExampleSpec();}
+            </Target>
+        </InitializerExecution>
+
+        <FieldRead>
+            <Source>java.lang.String com.didichuxing.tools.test.ExampleSpec.name</Source>
+            <Target>$_= "hello world";</Target>
+        </FieldRead>
+
+        <FieldWrite>
+            <Source>java.lang.String com.didichuxing.tools.test.ExampleSpec.name</Source>
+            <Target>com.didichuxing.tools.test.ExampleSpec.name = "hello world";</Target>
+        </FieldWrite>
+    </Replace>
+
+    <Insert>
+        <BeforeMethodCall>
+            <Source>void com.didichuxing.tools.test.ExampleSpec.run()</Source>
+            <Target>{java.lang.System.out.println("BeforeMethodCall");}</Target>
+        </BeforeMethodCall>
+
+        <AfterMethodCall>
+            <Source>void com.didichuxing.tools.test.ExampleSpec.run()</Source>
+            <Target>{java.lang.System.out.println("AfterMethodCall");}</Target>
+        </AfterMethodCall>
+
+        <BeforeMethodExecution>
+            <Source>void com.didichuxing.tools.test.ExampleSpec.run()</Source>
+            <Target>{java.lang.System.out.println("insert before OnClickListener");}</Target>
+        </BeforeMethodExecution>
+
+        <AfterMethodExecution>
+            <Source>void com.didichuxing.tools.test.ExampleSpec.run()</Source>
+            <Target>{java.lang.System.out.println("BeforeMethodExecution");}</Target>
+        </AfterMethodExecution>
+
+
+        <BeforeConstructorCall>
+            <Source>new com.didichuxing.tools.test.ExampleSpec()</Source>
+            <Target>java.lang.System.out.println("BeforeConstructorCall");</Target>
+        </BeforeConstructorCall>
+
+        <AfterConstructorCall>
+            <Source>new com.didichuxing.tools.test.ExampleSpec()</Source>
+            <Target>java.lang.System.out.println("AfterConstructorCall");</Target>
+        </AfterConstructorCall>
+
+
+        <BeforeConstructorExecution>
+            <Source>new com.didichuxing.tools.test.ExampleSpec()</Source>
+            <Target>java.lang.System.out.println("BeforeMethodExecution");</Target>
+        </BeforeConstructorExecution>
+
+        <AfterConstructorExecution>
+            <Source>new com.didichuxing.tools.test.ExampleSpec()</Source>
+            <Target>java.lang.System.out.println("AfterConstructorExecution");</Target>
+        </AfterConstructorExecution>
+
+
+        <BeforeInitializerExecution>
+            <Source>com.didichuxing.tools.test.ExampleSpec</Source>
+            <Target>{java.lang.System.out.println("BeforeInitializerExecution");}</Target>
+        </BeforeInitializerExecution>
+
+        <AfterInitializerExecution>
+            <Source>com.didichuxing.tools.test.ExampleSpec</Source>
+            <Target>{java.lang.System.out.println("AfterInitializerExecution");}</Target>
+        </AfterInitializerExecution>
+
+
+        <BeforeFieldRead>
+            <Source>int com.didichuxing.tools.test.ExampleSpec.id</Source>
+            <Target>java.lang.System.out.println("insert BeforeFieldRead");</Target>
+        </BeforeFieldRead>
+
+        <AfterFieldRead>
+            <Source>int com.didichuxing.tools.test.ExampleSpec.id</Source>
+            <Target>java.lang.System.out.println("insert AfterFieldRead");</Target>
+        </AfterFieldRead>
+
+
+        <BeforeFieldWrite>
+            <Source>int com.didichuxing.tools.test.ExampleSpec.id</Source>
+            <Target>java.lang.System.out.println("insert BeforeFieldWrite");</Target>
+        </BeforeFieldWrite>
+
+        <AfterFieldWrite>
+            <Source>int com.didichuxing.tools.test.ExampleSpec.id</Source>
+            <Target>java.lang.System.out.println("insert AfterFieldWrite");</Target>
+        </AfterFieldWrite>
+
+    </Insert>
+
+    <Around>
+        <MethodCall>
+            <Source>
+                void com.didichuxing.tools.test.ExampleSpec.call()
+            </Source>
+            <TargetBefore>
+                java.lang.System.out.println("around before MethodCall");
+            </TargetBefore>
+            <TargetAfter>
+                java.lang.System.out.println("around after MethodCall");
+            </TargetAfter>
+        </MethodCall>
+
+        <MethodExecution>
+            <Source>
+                void com.didichuxing.tools.test.ExampleSpec.call()
+            </Source>
+            <TargetBefore>
+                java.lang.System.out.println("around before MethodExecution");
+                long start=java.lang.System.currentTimeMillis();
+            </TargetBefore>
+            <TargetAfter>
+                {
+                System.out.println("time use=" + (System.currentTimeMillis() - start));
+                java.lang.System.out.println("around after MethodExecution");
+                }
+            </TargetAfter>
+        </MethodExecution>
+
+        <ConstructorCall>
+            <Source>new com.didichuxing.tools.test.ExampleSpec(java.lang.String)</Source>
+            <TargetBefore>
+                {java.lang.System.out.println("around before ConstructorCall");}
+            </TargetBefore>
+            <TargetAfter>
+                {java.lang.System.out.println("around after ConstructorCall");}
+            </TargetAfter>
+        </ConstructorCall>
+
+
+        <ConstructorExecution>
+            <Source>new com.didichuxing.tools.test.ExampleSpec(java.lang.String)</Source>
+            <TargetBefore>
+                {java.lang.System.out.println("around before ConstructorExecution");}
+            </TargetBefore>
+            <TargetAfter>
+                {java.lang.System.out.println("around after ConstructorExecution");}
+            </TargetAfter>
+        </ConstructorExecution>
+
+
+        <InitializerExecution>
+            <Source>com.didichuxing.tools.test.ExampleSpec</Source>
+            <TargetBefore>{java.lang.System.out.println("around before InitializerExecution");}
+            </TargetBefore>
+            <TargetAfter>{java.lang.System.out.println("around before InitializerExecution");}
+            </TargetAfter>
+        </InitializerExecution>
+
+
+        <FieldWrite>
+            <Source>int com.didichuxing.tools.test.ExampleSpec.id2</Source>
+            <TargetBefore>java.lang.System.out.println("around before FieldWrite");</TargetBefore>
+            <TargetAfter>java.lang.System.out.println("around before FieldWrite");</TargetAfter>
+        </FieldWrite>
+
+        <FieldRead>
+            <Source>int com.didichuxing.tools.test.ExampleSpec.id2</Source>
+            <TargetBefore>java.lang.System.out.println("insert before FieldRead");</TargetBefore>
+            <TargetAfter>java.lang.System.out.println("insert before FieldRead");</TargetAfter>
+        </FieldRead>
+    </Around>
+
+    <Enhance>
+
+        <!--add try cache for  MethodCall-->
+        <TryCatchMethodCall>
+            <Source>
+                void android.content.Context.startActivity(android.content.Intent)
+            </Source>
+            <Exception>
+                android.content.ActivityNotFoundException
+            </Exception>
+            <Target>
+                android.util.Log.d("test", "startActivity error", $e);
+            </Target>
+        </TryCatchMethodCall>
+
+        <TryCatchMethodExecution>
+            <Source>
+                void com.didichuxing.tools.test.ExampleSpec.uncaught()
+            </Source>
+            <Exception>
+                java.lang.Exception
+            </Exception>
+            <Target>
+                android.util.Log.d("test", "startActivity error", $e); return;
+            </Target>
+        </TryCatchMethodExecution>
+
+        <TryCatchConstructorCall>
+            <Source>new com.didichuxing.tools.test.ExampleSpec()</Source>
+            <Exception>
+                java.lang.Exception
+            </Exception>
+            <Target>
+                android.util.Log.d("test", "create ExampleSpec error", $e);
+            </Target>
+        </TryCatchConstructorCall>
+
+        <TryCatchConstructorExecution>
+            <Source>new com.didichuxing.tools.test.ExampleSpec(int,int)</Source>
+            <Exception>
+                java.lang.Exception
+            </Exception>
+            <Target>
+                android.util.Log.d("test", "create ExampleSpec error", $e);
+            </Target>
+        </TryCatchConstructorExecution>
+
+        <TryCatchInitializerExecution>
+            <Source>com.didichuxing.tools.test.ExampleSpec</Source>
+            <Exception>
+                java.lang.Exception
+            </Exception>
+            <Target>
+                android.util.Log.d("test", "create ExampleSpec error", $e);
+            </Target>
+        </TryCatchInitializerExecution>
+
+
+        <TimingMethodCall>
+            <Source>void com.didichuxing.tools.test.ExampleSpec.timing()</Source>
+            <Target>
+                android.util.Log.d("test", "time cost= "+ $time);
+            </Target>
+        </TimingMethodCall>
+
+        <TimingMethodExecution>
+            <Source>void com.didichuxing.tools.test.ExampleSpec.timing()</Source>
+            <Target>
+                android.util.Log.d("test", "$name().$class.$file.$line time cost=" + $time);
+            </Target>
+        </TimingMethodExecution>
+
+        <TimingMethodExecution>
+            <Source>void com.didichuxing.tools.test.IInterface.onTest()</Source>
+            <Target>
+                android.util.Log.d("test", "$name().$class.$file.$line time cost=" + $time);
+            </Target>
+        </TimingMethodExecution>
+
+
+        <TimingMethodExecution>
+            <Source>int com.didichuxing.tools.test.ExampleSpec.timing2()</Source>
+            <Target>
+                android.util.Log.d("test", "$class.$name().$file.$line time cost=" + $time);
+            </Target>
+        </TimingMethodExecution>
+
+        <TimingConstructorCall>
+            <Source>new com.didichuxing.tools.test.ExampleSpec()</Source>
+            <Target>
+                android.util.Log.d("test", "time cost= "+ $time);
+            </Target>
+        </TimingConstructorCall>
+
+        <TimingConstructorExecution>
+            <Source>new com.didichuxing.tools.test.ExampleSpec(int)</Source>
+            <Target>
+                android.util.Log.d("test", "time cost= "+ $time);
+            </Target>
+        </TimingConstructorExecution>
+
+        <TimingInitializerExecution>
+            <Source>com.didichuxing.tools.test.ExampleSpec</Source>
+            <Target>
+                android.util.Log.d("test", "time cost= "+ $time);
+            </Target>
+        </TimingInitializerExecution>
+
+        <TimingMethodExecution>
+            <Source>void com.didichuxing.tools.test.IInterface.onTest()</Source>
+            <Target>
+                android.util.Log.d("test", "$name().$class.$file.$line time cost=" + $time);
+            </Target>
+        </TimingMethodExecution>
+
+        <TimingMethodExecution>
+            <Source>void com.didichuxing.tools.test.IInterface$Callback.onCallback(java.lang.Object)
+            </Source>
+            <Target>
+                android.util.Log.d("test", "$name().$class.$file.$line time cost=" + $time);
+            </Target>
+        </TimingMethodExecution>
+
+        <TimingMethodExecution>
+            <Source>void com.didichuxing.tools.test.IInterface$Callback.onCallback(java.lang.Object)
+            </Source>
+            <Target>
+                android.util.Log.d("test", "$class.$name($file:$line) time cost=" + $time);
+            </Target>
+        </TimingMethodExecution>
+    </Enhance>
+
+
+</DroidAssist>

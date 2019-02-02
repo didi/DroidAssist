@@ -1,0 +1,1 @@
+./gradlew :sample:clean :sample:assembleDebug -Dorg.gradle.debug=true  --no-daemon --stacktrace

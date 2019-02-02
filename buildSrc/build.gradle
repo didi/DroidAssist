@@ -1,0 +1,30 @@
+
+apply plugin: 'groovy'
+apply plugin: 'idea'
+
+ext {
+    androidGradleVersion = '3.2.0'
+    assistVersion = '3.24.1-GA'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://maven.google.com" }
+    jcenter()
+}
+
+dependencies {
+    compile localGroovy()
+    compile gradleApi()
+    compile "org.javassist:javassist:$assistVersion" //'3.24.1-GA'
+    compile "com.android.tools.build:gradle:$androidGradleVersion"
+}
+
+sourceSets {
+    main {
+        groovy.srcDirs = ['src/main/groovy', '../plugin/src/main/groovy']
+        resources.srcDirs = ['src/main/resources', '../plugin/src/main/resources']
+        java.srcDirs = ['src/main/java', '../plugin/src/main/java']
+    }
+}

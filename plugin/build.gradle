@@ -1,0 +1,35 @@
+apply plugin: 'groovy'
+apply plugin: 'java'
+
+group = GROUP_ID
+version = VERSION
+project.archivesBaseName = ARTIFACT_ID
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+sourceSets {
+    main {
+        groovy {
+            srcDirs = ['src/main/groovy']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['src/main/java', 'src/main/groovy', 'src/test/java']
+        }
+    }
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+    testCompile "com.android.tools.build:gradle:$androidGradleVersion"
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile gradleApi()
+    compile localGroovy()
+    compileOnly "com.android.tools.build:gradle:$androidGradleVersion"
+
+    compile "org.javassist:javassist:$assistVersion" //'3.24.0-GA'
+}

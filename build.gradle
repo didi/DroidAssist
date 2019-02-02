@@ -1,0 +1,36 @@
+buildscript {
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://maven.google.com" }
+        jcenter()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:3.2.0"
+    }
+}
+
+
+ext {
+    lintVersion = '26.0.1'
+    kotlinVersion = '1.2.31'
+    androidGradleVersion = '3.0.0'
+    assistVersion = '3.24.0-GA'
+}
+
+allprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://maven.google.com" }
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+
