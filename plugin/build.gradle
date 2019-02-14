@@ -1,6 +1,8 @@
 apply plugin: 'groovy'
 apply plugin: 'java'
 
+apply from: 'upload.gradle'
+
 group = GROUP_ID
 version = VERSION
 project.archivesBaseName = ARTIFACT_ID
