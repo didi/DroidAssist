@@ -1,14 +1,17 @@
 package com.didichuxing.tools.droidassist.spec;
 
 
+import com.didichuxing.tools.droidassist.ex.DroidAssistBadStatementException;
 import com.didichuxing.tools.droidassist.ex.DroidAssistBadTypeException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This is a parser for custom aop pointcut expression.
- *
+ * <p>
  * Such as <pre>int android.util.Log.d(java.lang.String,java.lang.String)</pre>
  */
 public class SourceSpec {
@@ -164,15 +167,19 @@ public class SourceSpec {
     private static SourceSpec fromJavaPattern(String source, String kind) {
         Kind kd = Kind.valueOf(kind);
         if (kd == Kind.METHOD) {
+            checkMethodSource(source);
             return methodFromString(source);
         }
         if (kd == Kind.CONSTRUCTOR) {
+            checkConstructorSource(source);
             return constructorFromString(source);
         }
         if (kd == Kind.FIELD) {
+            checkFieldSource(source);
             return fieldFromString(source);
         }
         if (kd == Kind.INITIALIZER) {
+            checkInitializerSource(source);
             return initializerFromString(source);
         }
         throw new DroidAssistBadTypeException("Bad type :" + source);
@@ -324,6 +331,88 @@ public class SourceSpec {
                 declaringTy,
                 name,
                 paramTys);
+    }
+
+    private static void checkMethodSource(String source) {
+        String returnTypeEx = "\\s*(boolean|byte|char|double|float|int|long|short|void|([A-Za-z0-9_$]+\\.)*[A-Za-z0-9_$]+)(\\[\\])?";
+        String declaringEx = "([A-Za-z0-9_$]+\\.)*[A-Za-z0-9_$]+\\.[A-Za-z0-9_$]+";
+        String paramEx = "\\(\\s*((boolean|byte|char|double|float|int|long|short|void|([A-Za-z0-9_$]+\\.)*[A-Za-z0-9_$]+)(\\[\\])?\\s*,?)*\\)\\s*";
+        String validMethod = "A valid method expression should be [returnType packageName.className.methodName(paramType,paramType)]";
+        if (!source.matches(returnTypeEx + "\\s+" + declaringEx + paramEx)) {
+            String reason;
+            {
+                Pattern pattern = Pattern.compile(returnTypeEx + "\\s+");
+                Matcher matcher = pattern.matcher(source);
+                boolean hasReturnTypeEx = matcher.find();
+                if (!hasReturnTypeEx) {
+                    reason = "Return type for the method is missing";
+                    throwBadStatementException("Invalid java method expression: [" + source + "], " +
+                            "reason: " + reason + ", " + validMethod);
+                }
+            }
+            {
+                Pattern pattern = Pattern.compile(paramEx);
+                Matcher matcher = pattern.matcher(source);
+                boolean hasParamEx = matcher.find();
+                if (!hasParamEx) {
+                    reason = "Parameters for the method is missing";
+                    throwBadStatementException("Invalid java method expression: [" + source + "], " +
+                            "reason: " + reason + " , " + validMethod);
+                }
+            }
+
+            throwBadStatementException("Invalid java method expression: [" + source + "]" + ", " + validMethod);
+        }
+    }
+
+    private static void checkInitializerSource(String source) {
+        String ex = "\\s*([A-Za-z0-9_$]+\\.)*[A-Za-z0-9_$]+.[A-Za-z0-9_$]+\\s*";
+        if (!source.matches(ex)) {
+            throwBadStatementException("Invalid java initializer expression: [" + source + "], " +
+                    "A valid constructor initializer should be [ packageName.className ]");
+        }
+    }
+
+    private static void checkConstructorSource(String source) {
+        String ex1 = "new" +
+                "\\s+([A-Za-z0-9_$]+\\.)*[A-Za-z0-9_$]+.[A-Za-z0-9_$]+" +
+                "\\(\\s*((boolean|byte|char|double|float|int|long|short|void|([A-Za-z0-9_$]+\\.)*[A-Za-z0-9_$]+)(\\[\\])?\\s*,?)*\\)\\s*";
+
+        String ex2 = "\\s*([A-Za-z0-9_$]+\\.)*[A-Za-z0-9_$]+" +
+                "\\.new" +
+                "\\(\\s*((boolean|byte|char|double|float|int|long|short|void|([A-Za-z0-9_$]+\\.)*[A-Za-z0-9_$]+)(\\[\\])?\\s*,?)*\\)\\s*";
+
+        if (!source.matches(ex1) && !source.matches(ex2)) {
+            throwBadStatementException("Invalid java constructor expression: [" + source + "], " +
+                    "A valid constructor expression should be [new packageName.className(paramType,paramType)" +
+                    " or packageName.className.new(paramType,paramType)]");
+        }
+    }
+
+
+    private static void checkFieldSource(String source) {
+        String returnTypeEx = "\\s*(boolean|byte|char|double|float|int|long|short|void|([A-Za-z0-9_$]+\\.)*[A-Za-z0-9_$]+)(\\[\\])?";
+        String declaringEx = "([A-Za-z0-9_$]+\\.)*[A-Za-z0-9_$]+\\.[A-Za-z0-9_$]+";
+
+        String validField = "A valid field expression should be [fieldType packageName.className.fieldName]";
+        if (!source.matches(returnTypeEx + "\\s+" + declaringEx)) {
+            String reason;
+            {
+                Pattern pattern = Pattern.compile(returnTypeEx + "\\s+");
+                Matcher matcher = pattern.matcher(source);
+                boolean hasReturnTypeEx = matcher.find();
+                if (!hasReturnTypeEx) {
+                    reason = "Type for the filed is missing";
+                    throwBadStatementException("Invalid java field expression: [" + source + "], " +
+                            "reason: " + reason + ", " + validField);
+                }
+            }
+            throwBadStatementException("Invalid java field expression: [" + source + "]" + ", " + validField);
+        }
+    }
+
+    private static void throwBadStatementException(String msg) {
+        throw new DroidAssistBadStatementException(msg);
     }
 
     public enum Kind {
