@@ -4,8 +4,7 @@ import com.android.build.api.transform.QualifiedContent
 import com.didichuxing.tools.droidassist.DroidAssistContext
 import com.didichuxing.tools.droidassist.DroidAssistExecutor.BuildContext
 import com.didichuxing.tools.droidassist.ex.DroidAssistBadStatementException
-import com.didichuxing.tools.droidassist.ex.DroidAssistBadTypeException
-import com.didichuxing.tools.droidassist.ex.DroidAssistError
+import com.didichuxing.tools.droidassist.ex.DroidAssistException
 import com.didichuxing.tools.droidassist.ex.DroidAssistNotFoundException
 import com.didichuxing.tools.droidassist.util.IOUtils
 import com.didichuxing.tools.droidassist.util.Logger
@@ -50,16 +49,11 @@ abstract class InputTask<T extends QualifiedContent> implements Runnable {
         try {
             Logger.info("execute ${inputType}: ${IOUtils.getPath(taskInput.input.file)}")
             execute()
-        } catch (
-                DroidAssistError
-                | DroidAssistBadStatementException
-                | DroidAssistNotFoundException
-                | DroidAssistBadTypeException e) {
+        } catch (DroidAssistException e) {
             throw e
         } catch (Throwable e) {
-            Logger.error("Process input err:", e)
-            e.fillInStackTrace()
-            throw e
+            throw new DroidAssistException("Execution failed for " +
+                    "input:${IOUtils.getPath(taskInput.input.file)}", e)
         }
     }
 
@@ -76,7 +70,7 @@ abstract class InputTask<T extends QualifiedContent> implements Runnable {
     boolean executeClass(String className, File directory) {
         buildContext.totalCounter.incrementAndGet()
         def inputClass = null
-        def transformers = context.configuration.transformers
+        def transformers = context.transformers
         def classAllowed = transformers.any {
             it.classAllowed(className)
         }
@@ -94,16 +88,17 @@ abstract class InputTask<T extends QualifiedContent> implements Runnable {
             try {
                 it.performTransform(inputClass, className)
             } catch (NotFoundException e) {
-                String msg = "Perform transform error: cannot find " +
-                        e.message + " in " + className
-                Logger.error(msg, e)
-                throw new DroidAssistNotFoundException(msg)
+                throw new DroidAssistNotFoundException(
+                        "Transform failed for class: ${className}" +
+                                " with not found exception: ${e.cause.message}", e)
             } catch (CannotCompileException e) {
-                Logger.error("Perform transform compile err", e)
-                throw new DroidAssistBadStatementException(e)
+                throw new DroidAssistBadStatementException(
+                        "Transform failed for class: ${className} " +
+                                "with compile error: ${e.cause.message}", e)
             } catch (Throwable e) {
-                Logger.error("Transform error:", e)
-                throw e
+                throw new DroidAssistException(
+                        "Transform failed for class: ${className} " +
+                                "with error: ${e.cause.message}", e)
             }
         }
 

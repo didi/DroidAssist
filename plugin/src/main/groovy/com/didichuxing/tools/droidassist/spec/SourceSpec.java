@@ -486,7 +486,7 @@ public class SourceSpec {
             return packageName;
         }
 
-        private String getName() {
+        public String getName() {
             return signatureToName(signature);
         }
 
@@ -577,6 +577,25 @@ public class SourceSpec {
                 return name.replace('.', '/');
             }
 
+            String packageName;
+            int angly = name.indexOf('<');
+            if (angly != -1) {
+                name = name.substring(0, angly);
+            }
+            int index = name.lastIndexOf('.');
+            if (index == -1) {
+                packageName = "";
+            } else {
+                packageName = name.substring(0, index);
+            }
+            if (packageName.equals("")) {
+                try {
+                    String jlang = "java.lang." + name;
+                    Class.forName(jlang);
+                    name = jlang;
+                } catch (ClassNotFoundException ignore) {
+                }
+            }
             return "L" + name.replace('.', '/') + ';';
         }
 

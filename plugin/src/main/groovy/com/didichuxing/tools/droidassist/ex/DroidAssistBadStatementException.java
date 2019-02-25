@@ -1,46 +1,18 @@
 package com.didichuxing.tools.droidassist.ex;
 
 @SuppressWarnings("WeakerAccess")
-public class DroidAssistBadStatementException extends RuntimeException {
+public class DroidAssistBadStatementException extends DroidAssistException {
 
-    private Throwable myCause;
-
-    public Throwable getCause() {
-        return (myCause == this ? null : myCause);
-    }
-
-
-    public synchronized Throwable initCause(Throwable cause) {
-        myCause = cause;
-        return this;
-    }
-
-    private String message;
-
-    public String getReason() {
-        if (message != null) {
-            return message;
-        } else {
-            return this.toString();
-        }
-    }
 
     public DroidAssistBadStatementException(String msg) {
         super(msg);
-        message = msg;
-        initCause(null);
     }
-
 
     public DroidAssistBadStatementException(Throwable e) {
-        super("by " + e.toString());
-        message = null;
-        initCause(e);
+        super(e);
     }
 
-
     public DroidAssistBadStatementException(String msg, Throwable e) {
-        this(msg);
-        initCause(e);
+        super(msg, e);
     }
 }

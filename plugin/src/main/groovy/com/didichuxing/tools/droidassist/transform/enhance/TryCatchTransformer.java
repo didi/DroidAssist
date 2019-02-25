@@ -1,5 +1,6 @@
 package com.didichuxing.tools.droidassist.transform.enhance;
 
+import com.didichuxing.tools.droidassist.spec.SourceSpec;
 import com.didichuxing.tools.droidassist.transform.ExprExecTransformer;
 
 import javassist.CtClass;
@@ -25,15 +26,12 @@ public abstract class TryCatchTransformer extends ExprExecTransformer {
         if (exception == null || exception.trim().equals("")) {
             exception = " java.lang.Exception";
         }
-        return exception;
+        return SourceSpec.Type.forName(exception).getName();
     }
 
     protected CtClass getExceptionClass() throws NotFoundException {
         if (exceptionClass == null) {
-            if (exception == null || exception.trim().equals("")) {
-                exception = " java.lang.Exception";
-            }
-            exceptionClass = classPool.get(exception);
+            exceptionClass = classPool.get(getException());
         }
         return exceptionClass;
     }

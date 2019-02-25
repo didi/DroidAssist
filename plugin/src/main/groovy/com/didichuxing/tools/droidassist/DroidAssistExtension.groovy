@@ -8,7 +8,7 @@ import com.google.common.collect.Lists
 class DroidAssistExtension {
     boolean enable = true
     int logLevel = -1
-    File config
+    List<File> configFiles = Lists.newArrayList()
     File logDir
     boolean abortOnUndefinedClass = false
 
@@ -23,12 +23,20 @@ class DroidAssistExtension {
         includes.addAll(filter)
     }
 
+    void config(File... file) {
+        configFiles.addAll(file)
+    }
+
+    List<File> getConfig() {
+        return configFiles
+    }
+
     @Override
     String toString() {
         return "\n{" +
                 "\n    enable=" + enable +
                 "\n    logLevel=" + logLevel +
-                "\n    config=" + config +
+                "\n    config=" + configFiles +
                 "\n    logDir=" + logDir +
                 "\n    includes=" + includes +
                 "\n    excludes=" + excludes +

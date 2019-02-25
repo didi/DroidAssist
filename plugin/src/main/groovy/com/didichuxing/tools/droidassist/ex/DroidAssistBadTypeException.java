@@ -1,20 +1,16 @@
 package com.didichuxing.tools.droidassist.ex;
 
-public class DroidAssistBadTypeException extends RuntimeException {
+public class DroidAssistBadTypeException extends DroidAssistException {
 
-    public DroidAssistBadTypeException(String s) {
-        super(s);
+    public DroidAssistBadTypeException(String msg) {
+        super(msg);
     }
 
-    public DroidAssistBadTypeException(String s, Throwable throwable) {
-        super(s, throwable);
+    public DroidAssistBadTypeException(Throwable e) {
+        super(e);
     }
 
-    public DroidAssistBadTypeException(Throwable throwable) {
-        super(throwable);
-    }
-
-    public DroidAssistBadTypeException(String s, Throwable throwable, boolean b, boolean b1) {
-        super(s, throwable, b, b1);
+    public DroidAssistBadTypeException(String msg, Throwable e) {
+        super(msg, e);
     }
 }

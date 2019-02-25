@@ -160,7 +160,7 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
                     try {
                         disposed = execute(inputClass, inputClassName, call);
                     } catch (NotFoundException e) {
-                        String msg = "cannot find " + e.getMessage() + "in " + inputClassName;
+                        String msg = e.getMessage() + " for input class " + inputClassName;
                         throw new CannotCompileException(msg, e);
                     }
                     modified.set(modified.get() | disposed);
@@ -174,7 +174,7 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
                     try {
                         disposed = execute(inputClass, inputClassName, fieldAccess);
                     } catch (NotFoundException e) {
-                        String msg = "cannot find " + e.getMessage() + "in " + inputClassName;
+                        String msg = e.getMessage() + " for input class " + inputClassName;
                         throw new CannotCompileException(msg, e);
                     }
                     modified.set(modified.get() | disposed);
@@ -188,7 +188,7 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
                     try {
                         disposed = execute(inputClass, inputClassName, newExpr);
                     } catch (NotFoundException e) {
-                        String msg = "cannot find " + e.getMessage() + "in " + inputClassName;
+                        String msg = e.getMessage() + " for input class " + inputClassName;
                         throw new CannotCompileException(msg, e);
                     }
                     modified.set(modified.get() | disposed);

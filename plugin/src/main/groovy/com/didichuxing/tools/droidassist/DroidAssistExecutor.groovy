@@ -38,14 +38,15 @@ class DroidAssistExecutor {
     }
 
     void execute(Collection<TransformInput> inputs) {
-        def dirStream = inputs.parallelStream()
-                .flatMap { it.directoryInputs.parallelStream() }
+        def dirStream = inputs.stream()
+                .flatMap { it.directoryInputs.stream() }
 
-        def jarStream = inputs.parallelStream()
-                .flatMap { it.jarInputs.parallelStream() }
+        def jarStream = inputs.stream()
+                .flatMap { it.jarInputs.stream() }
 
         Stream.concat(dirStream, jarStream)
-                .map { input -> createTask(input) }
+                .parallel()
+                .map { createTask(it) }
                 .filter { it != null }
                 .forEach { it.run() }
     }

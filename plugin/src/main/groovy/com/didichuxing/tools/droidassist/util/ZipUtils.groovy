@@ -32,7 +32,6 @@ class ZipUtils {
     static Stream<String> collectAllClassesFromJar(File jar) {
         return new ZipFile(jar)
                 .stream()
-                .parallel()
                 .filter { !it.isDirectory() }
                 .map { it.name }
                 .filter { it.endsWith(DOT_CLASS) }

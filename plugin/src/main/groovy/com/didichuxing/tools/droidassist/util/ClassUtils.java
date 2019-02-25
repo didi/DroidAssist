@@ -81,7 +81,7 @@ public class ClassUtils {
                 return method;
             }
         }
-        throw new NotFoundException("Method " + name + ":" + signature +
+        throw new NotFoundException("Method " + name + signature +
                 " not found in class " + ctClass.getName());
     }
 

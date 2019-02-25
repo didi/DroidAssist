@@ -3,10 +3,6 @@ package com.didichuxing.tools.droidassist
 import com.android.annotations.NonNull
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.didichuxing.tools.droidassist.ex.DroidAssistBadStatementException
-import com.didichuxing.tools.droidassist.ex.DroidAssistBadTypeException
-import com.didichuxing.tools.droidassist.ex.DroidAssistError
-import com.didichuxing.tools.droidassist.ex.DroidAssistNotFoundException
 import com.didichuxing.tools.droidassist.util.GradleUtils
 import com.didichuxing.tools.droidassist.util.Logger
 import com.didichuxing.tools.droidassist.util.TimingLogger
@@ -86,14 +82,8 @@ class DroidAssistTransform extends Transform {
                     invocation.getReferencedInputs(),
                     invocation.getOutputProvider(),
                     invocation.isIncremental())
-        } catch (
-                DroidAssistError
-                | DroidAssistBadStatementException
-                | DroidAssistNotFoundException
-                | DroidAssistBadTypeException e) {
-            throw e
         } catch (Throwable e) {
-            Logger.error("Transform error:", e)
+            Logger.error("Build failed with an exception: ${e.cause?.message}", e)
             e.fillInStackTrace()
             throw e
         } finally {

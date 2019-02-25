@@ -69,7 +69,7 @@ class DirInputTask extends InputTask<DirectoryInput> {
             files.addAll(fileList)
         }
 
-        files.parallelStream()
+        files.stream()
                 .filter { it.isFile() }//Path to file
                 .filter { it.name.endsWith(DOT_CLASS) }//Filter class file
                 .forEach { executeClass(it, inputDir, temporaryDir) }

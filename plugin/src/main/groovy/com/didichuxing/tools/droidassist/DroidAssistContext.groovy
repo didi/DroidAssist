@@ -2,11 +2,14 @@ package com.didichuxing.tools.droidassist
 
 import com.android.build.api.transform.Context
 import com.android.build.api.transform.TransformInput
+import com.didichuxing.tools.droidassist.ex.DroidAssistException
+import com.didichuxing.tools.droidassist.transform.Transformer
 import com.didichuxing.tools.droidassist.util.IOUtils
 import com.didichuxing.tools.droidassist.util.Logger
 import javassist.ClassPool
 import org.gradle.api.Project
 
+import java.util.stream.Collectors
 import java.util.stream.Stream
 
 /**
@@ -16,10 +19,10 @@ class DroidAssistContext {
 
     Context context
     Project project
-    DroidAssistConfiguration configuration
     ClassPool classPool
     DroidAssistExtension extension
     Collection<TransformInput> referencedInputs
+    Collection<Transformer> transformers
 
     DroidAssistContext(
             Context context,
@@ -30,37 +33,45 @@ class DroidAssistContext {
         this.project = project
         this.extension = extension
         this.referencedInputs = referencedInputs
-
-        configuration = new DroidAssistConfiguration(project)
     }
 
     def configure() {
         try {
             createClassPool()
         } catch (Throwable e) {
-            Logger.error("Create class pool error", e)
-            throw e
+            throw new DroidAssistException("Failed to create class pool", e)
         }
 
-        try {
-            loadConfiguration()
-        } catch (Throwable e) {
-            Logger.error("Load configuration error", e)
-            throw e
-        }
+        transformers = loadConfiguration()
     }
 
     def loadConfiguration() {
-        Logger.info "Dump transformers:"
-        configuration.parserFrom(extension.config).each {
-            transformer ->
-                transformer.classFilterSpec.addIncludes(extension.includes)
-                transformer.classFilterSpec.addExcludes(extension.excludes)
-                transformer.setClassPool(classPool)
-                transformer.setAbortOnUndefinedClass(extension.abortOnUndefinedClass)
-                transformer.check()
-                Logger.info "transformer: ${transformer}"
+        def transformers = extension.configFiles
+                .parallelStream()
+                .flatMap {
+            try {
+                def list = new DroidAssistConfiguration(project).parse(it)
+                return list.stream().peek {
+                    transformer ->
+                        transformer.classFilterSpec.addIncludes(extension.includes)
+                        transformer.classFilterSpec.addExcludes(extension.excludes)
+                        transformer.setClassPool(classPool)
+                        transformer.setAbortOnUndefinedClass(extension.abortOnUndefinedClass)
+                        transformer.check()
+                }
+            } catch (Throwable e) {
+                throw new DroidAssistException("Unable to load configuration," +
+                        " unexpected exception occurs when parsing config file:$it, " +
+                        "What went wrong:\n${e.message}", e)
+            }
+        }//parse each file
+                .collect(Collectors.toList())
+
+        Logger.info("Dump transformers:")
+        transformers.each {
+            Logger.info("transformer: $it")
         }
+        return transformers
     }
 
     def createClassPool() {

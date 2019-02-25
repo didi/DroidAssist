@@ -1,6 +1,7 @@
 package com.didichuxing.tools.droidassist.ex;
 
-public class DroidAssistError extends Error {
+
+public class DroidAssistException extends RuntimeException {
 
     private Throwable myCause;
 
@@ -23,21 +24,21 @@ public class DroidAssistError extends Error {
         }
     }
 
-    public DroidAssistError(String msg) {
+    public DroidAssistException(String msg) {
         super(msg);
         message = msg;
         initCause(null);
     }
 
 
-    public DroidAssistError(Throwable e) {
-        super("by " + e.toString());
+    public DroidAssistException(Throwable e) {
+        super(e);
         message = null;
         initCause(e);
     }
 
 
-    public DroidAssistError(String msg, Throwable e) {
+    public DroidAssistException(String msg, Throwable e) {
         this(msg);
         initCause(e);
     }
