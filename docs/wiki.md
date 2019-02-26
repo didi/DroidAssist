@@ -68,14 +68,14 @@ Insert、Replace、Around、Enhance 类型代码操作配置中均需要包含 `
 例:
 ```xml
 <Replace>
-	<MethodCall>
-	    <Source>
-	        int android.util.Log.d(java.lang.String,java.lang.String)
-	    </Source>
-	    <Target>
-	        $_= com.didichuxing.tools.test.LogUtils.log($$);
-	    </Target>
-	</MethodCall>
+    <MethodCall>
+        <Source>
+            int android.util.Log.d(java.lang.String,java.lang.String)
+        </Source>
+        <Target>
+            $_= com.didichuxing.tools.test.LogUtils.log($$);
+        </Target>
+    </MethodCall>
 </Replace>
 ```
 Source 的值 `int android.util.Log.d(java.lang.String,java.lang.String)` 表示需要匹配方法调用 `android.util.Log.d( )`
@@ -169,20 +169,20 @@ Source 表示静态初始化块时，格式为 `className` ：
 例:
 ```xml
 <Replace>
-	<MethodCall>
-	    <Source>
-	        int android.util.Log.d(java.lang.String,java.lang.String)
-	    </Source>
-	    <Target>
-	        com.didichuxing.tools.test.LogUtils.log($$);
-	    </Target>
-	</MethodCall>
+    <MethodCall>
+        <Source>
+            int android.util.Log.d(java.lang.String,java.lang.String)
+        </Source>
+        <Target>
+            com.didichuxing.tools.test.LogUtils.log($$);
+        </Target>
+    </MethodCall>
     <Filter>
-           <Include>*</Include>
-           <Exclude>com.didichuxing.tools.test.Utils</Exclude>
-           <Exclude>android.*</Exclude>
-           <Exclude>com.android.*</Exclude>
-       </Filter>
+        <Include>*</Include>
+        <Exclude>com.didichuxing.tools.test.Utils</Exclude>
+        <Exclude>android.*</Exclude>
+        <Exclude>com.android.*</Exclude>
+    </Filter>
 </Replace>
 ```
 该配置中的 Filter 中 有1个 Include 配置，值 `*` 表示将处理所有的 class，有 3 个 Exclude 配置表示将不处理`com.didichuxing.tools.test.Utils` 类，以及类名匹配 `android.*` 和 `com.android.*` 的类。
@@ -217,18 +217,18 @@ Replace 类型代码操作配置的作用是将指定代码替换成目标代码
 例:
 ```xml
 <Replace>
-	<MethodCall>
-	    <Source>
-	        int android.util.Log.d(java.lang.String,java.lang.String)
-	    </Source>
-	    <Target>
-	        $_= com.didichuxing.tools.test.LogUtils.log($$);
-	    </Target>
-	</MethodCall>
-	<ConstructorCall>
-	   <Source>new com.didichuxing.tools.test.ExampleSpec(int)</Source>
-	   <Target>{$_= com.didichuxing.tools.test.ExampleSpec.getInstance();}</Target>
-	</ConstructorCall>
+    <MethodCall>
+        <Source>
+            int android.util.Log.d(java.lang.String,java.lang.String)
+        </Source>
+        <Target>
+            $_= com.didichuxing.tools.test.LogUtils.log($$);
+        </Target>
+    </MethodCall>
+    <ConstructorCall>
+        <Source>new com.didichuxing.tools.test.ExampleSpec(int)</Source>
+        <Target>{$_= com.didichuxing.tools.test.ExampleSpec.getInstance();}</Target>
+    </ConstructorCall>
 </Replace>
 ```
 

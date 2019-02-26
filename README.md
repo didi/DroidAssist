@@ -28,7 +28,7 @@ dependencies {
 ```groovy
 apply plugin: 'com.didichuxing.tools.droidassist'
 droidAssistOptions {
-    config file("droidassist.xml")// Point to the DroidAssist config file. (required)
+    config file("droidassist.xml"), file("droidassist2.xml")// Point to the DroidAssist config files. (required)
 }
 ```
 
