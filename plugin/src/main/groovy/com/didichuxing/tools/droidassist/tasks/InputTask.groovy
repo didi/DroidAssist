@@ -62,7 +62,10 @@ abstract class InputTask<T extends QualifiedContent> implements Runnable {
     abstract String getInputType()
 
     File ensureTemporaryDir() {
-        def dir = new File("${buildContext.temporaryDir}/${inputType}/${taskInput.input.name}")
+        def dir = new File(
+                "${buildContext.temporaryDir}/" +
+                        "${inputType}/" +
+                        "${taskInput.input.name.replace(":", "-")}")
         cleanOutputDir(dir)
         return dir
     }
