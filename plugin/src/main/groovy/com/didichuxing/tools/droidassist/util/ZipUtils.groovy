@@ -35,7 +35,7 @@ class ZipUtils {
                 .filter { !it.isDirectory() }
                 .map { it.name }
                 .filter { it.endsWith(DOT_CLASS) }
-                .map { it.replace(File.separator, ".") }
+                .map { it.replace("/", ".") }//always '/' from java side
                 .map { FilenameUtils.removeExtension(it) }
     }
 
