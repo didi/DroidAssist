@@ -39,18 +39,23 @@ class DirInputTask extends InputTask<DirectoryInput> {
 
         if (taskInput.incremental) {
             //process changedFiles in incremental mode.
-            //if file is changed or removed, delete corresponding cache.
+            //if file is removed, delete corresponding dest file.
             //if file is changed or added, add file to pending collections.
             input.changedFiles.each {
                 file, status ->
-                    if (status == Status.CHANGED || status == Status.REMOVED) {
-                        def cache = getDestFileMapping(file, inputDir, taskInput.dest)
-                        if (cache != null) {
-                            FileUtils.deleteQuietly(cache)
+                    def destFile = getDestFileMapping(file, inputDir, taskInput.dest)
+                    if (status == Status.REMOVED) {
+                        if (destFile != null) {
+                            FileUtils.deleteQuietly(destFile)
                         }
                     }
                     if (status == Status.CHANGED || status == Status.ADDED) {
                         files << file
+                        if (destFile != null) {
+                            executor.execute {
+                                FileUtils.copyFile(file, destFile)
+                            }
+                        }
                     }
             }
         } else {
