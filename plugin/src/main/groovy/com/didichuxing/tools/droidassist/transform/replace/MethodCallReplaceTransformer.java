@@ -54,22 +54,6 @@ public class MethodCallReplaceTransformer extends ReplaceTransformer {
         }
 
         String target = getTarget();
-        if (!isVoidSourceReturnType()) {
-            if ((!target.startsWith("$_=") && !target.startsWith("$_ ="))) {
-                if (target.startsWith("{")) {
-                    target = "{" + "$_=" + target.substring(1);
-                } else {
-                    target = "$_=" + target;
-                }
-            }
-        } else {
-            target = target.
-                    replaceFirst(
-                            Pattern.quote("$_="), Matcher.quoteReplacement(""))
-                    .replaceFirst(
-                            Pattern.quote("$_ ="), Matcher.quoteReplacement(""));
-        }
-
         String replacement = replaceInstrument(methodCall, target);
         Logger.warning(getPrettyName() + " by: " + replacement
                 + " at " + inputClassName + ".java" + ":" + methodCall.getLineNumber());
