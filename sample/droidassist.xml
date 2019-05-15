@@ -16,7 +16,7 @@
                 int android.util.Log.d(java.lang.String,java.lang.String)
             </Source>
             <Target>
-                com.didichuxing.tools.test.LogUtils.log($$);
+                $_= com.didichuxing.tools.test.LogUtils.log($$);
             </Target>
             <Filter>
                 <Include>*</Include>
