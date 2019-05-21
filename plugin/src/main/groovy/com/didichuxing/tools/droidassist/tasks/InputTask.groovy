@@ -93,15 +93,15 @@ abstract class InputTask<T extends QualifiedContent> implements Runnable {
             } catch (NotFoundException e) {
                 throw new DroidAssistNotFoundException(
                         "Transform failed for class: ${className}" +
-                                " with not found exception: ${e.cause.message}", e)
+                                " with not found exception: ${e.cause?.message}", e)
             } catch (CannotCompileException e) {
                 throw new DroidAssistBadStatementException(
                         "Transform failed for class: ${className} " +
-                                "with compile error: ${e.cause.message}", e)
+                                "with compile error: ${e.cause?.message}", e)
             } catch (Throwable e) {
                 throw new DroidAssistException(
                         "Transform failed for class: ${className} " +
-                                "with error: ${e.cause.message}", e)
+                                "with error: ${e.cause?.message}", e)
             }
         }
 

@@ -70,10 +70,12 @@ public class MethodExecutionTryCatchTransformer extends TryCatchTransformer {
         target = target.replace("\\s+", " ");
         boolean returnStatement =
                 target.contains(" return ")
+                        || target.contains("return ")
                         || target.contains(" return;")
                         || target.contains(";return;")
                         || target.contains(";return ")
                         || target.contains(" throw ")
+                        || target.contains("throw ")
                         || target.contains(";throw ");
         if (isVoid) {
             if (!returnStatement) {
