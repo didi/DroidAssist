@@ -11,6 +11,7 @@ class DroidAssistExtension {
     List<File> configFiles = Lists.newArrayList()
     File logDir
     boolean abortOnUndefinedClass = false
+    boolean incremental = true
 
     List<String> includes = Lists.newArrayList()
     List<String> excludes = Lists.newArrayList()

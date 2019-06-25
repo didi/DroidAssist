@@ -55,7 +55,7 @@ class DroidAssistTransform extends Transform {
 
     @Override
     boolean isIncremental() {
-        return true
+        return gradleExtension.incremental
     }
 
     /**
