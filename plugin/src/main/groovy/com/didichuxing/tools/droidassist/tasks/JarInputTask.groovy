@@ -33,6 +33,7 @@ class JarInputTask extends InputTask<JarInput> {
         File inputJar = input.file
         if (taskInput.incremental) {
             if (input.status != Status.NOTCHANGED) {
+                Logger.info("Jar incremental build: \ninput:${ taskInput.input.name} \npath: ${IOUtils.getPath(inputJar)} \ndest:${taskInput.dest} \nstatus:${input.status}")
                 FileUtils.deleteQuietly(taskInput.dest)
             } else {
                 Logger.info("${IOUtils.getPath(inputJar)} not changed, skip.")

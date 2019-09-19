@@ -5,7 +5,11 @@ import com.didichuxing.tools.droidassist.tasks.DirInputTask
 import com.didichuxing.tools.droidassist.tasks.InputTask
 import com.didichuxing.tools.droidassist.tasks.JarInputTask
 import com.didichuxing.tools.droidassist.util.GradleUtils
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import org.apache.commons.io.FileUtils
 
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Stream
 
@@ -24,6 +28,8 @@ class DroidAssistExecutor {
     boolean incremental
     DroidAssistContext context
     BuildContext buildContext
+    File destCacheFile
+    def destCacheMapping = new ConcurrentHashMap<String, String>()
 
     DroidAssistExecutor(
             DroidAssistContext context,
@@ -33,8 +39,21 @@ class DroidAssistExecutor {
         this.incremental = incremental
         this.context = context
 
-        def dir = context.context.temporaryDir
-        buildContext = new BuildContext(temporaryDir: dir)
+        def temporaryDir = context.context.temporaryDir
+        buildContext = new BuildContext(temporaryDir: temporaryDir)
+
+        def buildDir = context.project.buildDir
+        def variant = context.context.variantName
+        destCacheFile =
+                new File("$buildDir/intermediates/droidAssist/$variant/dest-cache.json")
+
+        if (destCacheFile.exists()) {
+            if (incremental) {
+                destCacheMapping.putAll(new JsonSlurper().parse(destCacheFile))
+            } else {
+                FileUtils.forceDelete(destCacheFile)
+            }
+        }
     }
 
     void execute(Collection<TransformInput> inputs) {
@@ -49,13 +68,16 @@ class DroidAssistExecutor {
                 .map { createTask(it) }
                 .filter { it != null }
                 .forEach { it.run() }
+
+        FileUtils.forceMkdir(destCacheFile.parentFile)
+        destCacheFile.write(JsonOutput.toJson(destCacheMapping))
     }
 
     InputTask createTask(QualifiedContent content) {
         def taskInput =
                 new InputTask.TaskInput(
                         input: content,
-                        dest: GradleUtils.getTransformOutputLocation(outputProvider, content),
+                        dest: getDestFile(content),
                         incremental: incremental)
         if (content instanceof JarInput) {
             return new JarInputTask(context, buildContext, taskInput)
@@ -66,6 +88,17 @@ class DroidAssistExecutor {
         return null
     }
 
+    File getDestFile(QualifiedContent content) {
+        def path = destCacheMapping.get(content.name)
+        def buildDir = context.project.buildDir
+        File dest = path == null ? null : new File(buildDir, path)
+        if (dest == null || !dest.exists()) {
+            dest = GradleUtils.getTransformOutputLocation(outputProvider, content)
+            destCacheMapping.put(content.name, buildDir.toPath().relativize(dest.toPath()).toString())
+        }
+        return dest
+    }
+
     int getAffectedCount() {
         return buildContext.affectedCounter.get()
     }
@@ -73,4 +106,5 @@ class DroidAssistExecutor {
     int getClassCount() {
         return buildContext.totalCounter.get()
     }
+
 }

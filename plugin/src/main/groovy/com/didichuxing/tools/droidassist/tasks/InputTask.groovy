@@ -73,12 +73,11 @@ abstract class InputTask<T extends QualifiedContent> implements Runnable {
     boolean executeClass(String className, File directory) {
         buildContext.totalCounter.incrementAndGet()
         def inputClass = null
-        def transformers = context.transformers
-        def classAllowed = transformers.any {
+        def transformers = context.transformers.findAll {
             it.classAllowed(className)
         }
 
-        if (!classAllowed) {
+        if (transformers.isEmpty()) {
             return false
         }
 

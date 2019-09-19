@@ -43,8 +43,12 @@ class DroidAssistConfiguration {
             node.Filter.Include.each { includes.add(it.text()) }
             node.Filter.Exclude.each { excludes.add(it.text()) }
 
-            includes.addAll(globalIncludes)
-            excludes.addAll(globalExcludes)
+            if (!Boolean.valueOf(node.Filter.@ignoreGlobalIncludes[0])) {
+                includes.addAll(globalIncludes)
+            }
+            if (!Boolean.valueOf(node.Filter.@ignoreGlobalExcludes[0])) {
+                excludes.addAll(globalExcludes)
+            }
 
             transformer.classFilterSpec.addIncludes(includes)
             transformer.classFilterSpec.addExcludes(excludes)

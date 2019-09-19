@@ -18,9 +18,9 @@
             <Target>
                 $_= com.didichuxing.tools.test.LogUtils.log($$);
             </Target>
-            <Filter>
-                <Include>*</Include>
-                <Exclude>com.didichuxing.tools.test.Utils</Exclude>
+            <Filter ignoreGlobalIncludes="true">
+                <Include>om.didichuxing.tools.test.Utils</Include>
+                <!--<Exclude>com.didichuxing.tools.test.Utils</Exclude>-->
                 <!--<Exclude>android.*</Exclude>-->
                 <!--<Exclude>com.android.*</Exclude>-->
             </Filter>
