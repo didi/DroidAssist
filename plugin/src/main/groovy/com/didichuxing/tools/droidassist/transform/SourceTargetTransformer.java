@@ -48,14 +48,14 @@ public abstract class SourceTargetTransformer extends Transformer {
         return source;
     }
 
-    private String getSourceDeclaringClassName() {
+    protected String getSourceDeclaringClassName() {
         if (sourceDeclaringClassName == null) {
             sourceDeclaringClassName = sourceSpec.getDeclaringClassName();
         }
         return sourceDeclaringClassName;
     }
 
-    private CtClass getSourceClass() throws NotFoundException {
+    protected CtClass getSourceClass() throws NotFoundException {
         if (sourceClass == null) {
             sourceClass = classPool.getCtClass(getSourceDeclaringClassName());
         }

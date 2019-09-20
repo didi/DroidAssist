@@ -70,6 +70,8 @@ public class MainActivity extends Activity implements IInterface.Callback<String
         test4.timing();
 
         onCallback("");
+
+        Child.main(null);
     }
 
     @Override

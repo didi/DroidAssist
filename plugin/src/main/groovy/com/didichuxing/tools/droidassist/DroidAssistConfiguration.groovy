@@ -380,6 +380,12 @@ class DroidAssistConfiguration {
                     return new InitializerExecutionTimingTransformer()
                 }
         }
+        configs.Enhance.ReparentClass.each {
+            node ->
+                sourceTargetTransformerNodeHandler(INITIALIZER, node) {
+                    return new ReparentClassTransformer()
+                }
+        }
         return transformers
     }
 }

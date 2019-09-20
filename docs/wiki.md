@@ -188,7 +188,16 @@ Source 表示静态初始化块时，格式为 `className` ：
 该配置中的 Filter 中 有1个 Include 配置，值 `*` 表示将处理所有的 class，有 3 个 Exclude 配置表示将不处理`com.didichuxing.tools.test.Utils` 类，以及类名匹配 `android.*` 和 `com.android.*` 的类。
 
 >1. 每一个代码操作配置规则下都可以添加 Filter 配置(可选)
->2. Global 配置中可以包含 Filter，当 Filter 出现在 Global 配置中时，对所有的代码操作配置都生效。
+>2. Global 配置中可以包含 Filter，当 Filter 出现在 Global 配置中时，对所有的代码操作配置都生效，如果需要忽略全局 Filter 配置，可在 Filter 标签中添加 ignoreGlobalIncludes="true" 和 ignoreGlobalExcludes="true"
+例:
+```xml
+<Filter ignoreGlobalIncludes="true" ignoreGlobalExcludes="true">
+    <Include>*</Include>
+    <Exclude>android.*</Exclude>
+    <Exclude>com.android.*</Exclude>
+</Filter>
+```
+
 
 ### Global 配置
 Global 配置可以包含类过滤器 Filter：
@@ -342,6 +351,23 @@ Timing 类型配置会自动在 Source 代码前后添加耗时计算代码，�
 </TimingMethodExecution>
 ```
 > `$time`  扩展变量为 `long` 型，单位为毫秒，如果需要获取耗时的微秒值，可以使用 `$nanotime` 扩展变量。
+
+
+#### Reparent
+Reparent 类型配置可以重新设置制定 class 的父类
+- **ReparentClass** 重新设置类的父类型
+
+Reparent 类型配置将指定的类型( Source 中配置的类型)的直接子类的父类型设置到另外一个类型( Target 中配置的类型)。
+例:
+```xml
+<ReparentClass>
+    <Source>com.didichuxing.tools.test.Parent</Source>
+    <Target>com.didichuxing.tools.test.ReParent</Target>
+</ReparentClass>
+```
+上面例子中 class 'com.didichuxing.tools.test.Parent' 的直接子类在处理后父类型将被设置为 'com.didichuxing.tools.test.ReParent'
+
+> 使用此配置时需要注意 Source 类和 Target 类的 api 兼容性，需要注意子类中构造方法、方法、字段在重新设置到指定的父类后还能否有正确的继承关系。
 
 
 ## Q & A

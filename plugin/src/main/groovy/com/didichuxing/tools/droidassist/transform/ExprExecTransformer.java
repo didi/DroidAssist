@@ -1,6 +1,9 @@
 package com.didichuxing.tools.droidassist.transform;
 
 
+import com.google.common.collect.Sets;
+
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javassist.CannotCompileException;
@@ -10,6 +13,7 @@ import javassist.CtConstructor;
 import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
+import javassist.expr.ConstructorCall;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
@@ -18,6 +22,7 @@ import javassist.expr.NewExpr;
 @SuppressWarnings("RedundantThrows")
 public abstract class ExprExecTransformer extends SourceTargetTransformer {
 
+    protected static final String CONSTRUCTOR_CALL = "ConstructorCall";
     protected static final String METHOD_CALL = "MethodCall";
     protected static final String FIELD_ACCESS = "FieldAccess";
     protected static final String NEW_EXPR = "NewExpr";
@@ -36,6 +41,10 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
     }
 
     protected abstract String getExecuteType();
+
+    protected Set<String> getExtraExecuteTypes() {
+        return Sets.newHashSet();
+    }
 
     protected abstract String getTransformType();
 
@@ -107,9 +116,14 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
         if (!isMatchSourceClass(inputClass)) {
             return false;
         }
+        if (!execute(inputClass, inputClassName)) {
+            return false;
+        }
 
         boolean modified = false;
-        if (METHOD.equals(getExecuteType())) {
+        Set<String> executeTypes = getExtraExecuteTypes();
+        executeTypes.add(getExecuteType());
+        if (executeTypes.contains(METHOD)) {
             CtMethod[] declaredMethods = tryGetDeclaredMethods(inputClass);
             for (CtMethod method : declaredMethods) {
                 if (Modifier.isAbstract(method.getModifiers())) {
@@ -121,7 +135,7 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
             }
         }
 
-        if (CONSTRUCTOR.equals(getExecuteType())) {
+        if (executeTypes.contains(CONSTRUCTOR)) {
             CtConstructor[] declaredConstructors = tryGetDeclaredConstructors(inputClass);
             for (CtConstructor constructor : declaredConstructors) {
                 if (execute(inputClass, inputClassName, constructor)) {
@@ -130,7 +144,7 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
             }
         }
 
-        if (INITIALIZER.equals(getExecuteType())) {
+        if (executeTypes.contains(INITIALIZER)) {
             CtConstructor initializer = tryGetClassInitializer(inputClass);
             if (initializer != null) {
                 if (execute(inputClass, inputClassName, initializer)) {
@@ -149,13 +163,32 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
         if (!filterClass(inputClass, inputClassName)) {
             return false;
         }
+        if (!execute(inputClass, inputClassName)) {
+            return false;
+        }
 
+        final Set<String> executeTypes = getExtraExecuteTypes();
+        executeTypes.add(getExecuteType());
         final AtomicBoolean modified = new AtomicBoolean(false);
         Editor editor = new Editor() {
 
             @Override
+            public void edit(ConstructorCall call) throws CannotCompileException {
+                if (executeTypes.contains(CONSTRUCTOR_CALL)) {
+                    boolean disposed;
+                    try {
+                        disposed = execute(inputClass, inputClassName, call);
+                    } catch (NotFoundException e) {
+                        String msg = e.getMessage() + " for input class " + inputClassName;
+                        throw new CannotCompileException(msg, e);
+                    }
+                    modified.set(modified.get() | disposed);
+                }
+            }
+
+            @Override
             public void edit(MethodCall call) throws CannotCompileException {
-                if (METHOD_CALL.equals(getExecuteType())) {
+                if (executeTypes.contains(METHOD_CALL)) {
                     boolean disposed;
                     try {
                         disposed = execute(inputClass, inputClassName, call);
@@ -169,7 +202,7 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
 
             @Override
             public void edit(FieldAccess fieldAccess) throws CannotCompileException {
-                if (FIELD_ACCESS.equals(getExecuteType())) {
+                if (executeTypes.contains(FIELD_ACCESS)) {
                     boolean disposed;
                     try {
                         disposed = execute(inputClass, inputClassName, fieldAccess);
@@ -183,7 +216,7 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
 
             @Override
             public void edit(NewExpr newExpr) throws CannotCompileException {
-                if (NEW_EXPR.equals(getExecuteType())) {
+                if (executeTypes.contains(NEW_EXPR)) {
                     boolean disposed;
                     try {
                         disposed = execute(inputClass, inputClassName, newExpr);
@@ -233,6 +266,13 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
 
     protected boolean execute(
             CtClass inputClass,
+            String inputClassName)
+            throws CannotCompileException, NotFoundException {
+        return true;
+    }
+
+    protected boolean execute(
+            CtClass inputClass,
             String inputClassName,
             CtMethod method)
             throws CannotCompileException, NotFoundException {
@@ -251,6 +291,14 @@ public abstract class ExprExecTransformer extends SourceTargetTransformer {
             CtClass inputClass,
             String inputClassName,
             MethodCall methodCall)
+            throws CannotCompileException, NotFoundException {
+        return false;
+    }
+
+    protected boolean execute(
+            CtClass inputClass,
+            String inputClassName,
+            ConstructorCall constructorCall)
             throws CannotCompileException, NotFoundException {
         return false;
     }
