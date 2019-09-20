@@ -45,4 +45,6 @@
     <!ELEMENT Insert     (BeforeMethodCall*|AfterMethodCall*|BeforeMethodExecution*|AfterMethodExecution*|BeforeConstructorCall*|AfterConstructorCall*|BeforeConstructorExecution*|AfterConstructorExecution*|BeforeInitializerExecution*|AfterInitializerExecution*|BeforeFieldRead*|AfterFieldRead*|BeforeFieldWrite*|AfterFieldWrite*)*>
     <!ELEMENT Enhance    (TryCatchMethodCall*|TryCatchMethodExecution*|TryCatchConstructorCall*|TryCatchConstructorExecution*|TryCatchInitializerExecution*|TimingMethodCall*|TimingMethodExecution*|TimingConstructorCall*|TimingConstructorExecution*|TimingInitializerExecution)*>
     <!ATTLIST Source extend (true|false) "true">
+    <!ATTLIST Filter ignoreGlobalExcludes (true|false) "false">
+    <!ATTLIST Filter ignoreGlobalIncludes (true|false) "false">
     ]>
