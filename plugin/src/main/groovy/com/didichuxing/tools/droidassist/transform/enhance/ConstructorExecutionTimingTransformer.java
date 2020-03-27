@@ -36,9 +36,8 @@ public class ConstructorExecutionTimingTransformer extends TimingTransformer {
             throws CannotCompileException, NotFoundException {
 
         String name = constructor.getName();
-        String signature = constructor.getSignature();
 
-        if (!isMatchConstructorSource(inputClassName, signature)) {
+        if (!isMatchConstructorSource(inputClassName, constructor)) {
             return false;
         }
         String target = getTarget();

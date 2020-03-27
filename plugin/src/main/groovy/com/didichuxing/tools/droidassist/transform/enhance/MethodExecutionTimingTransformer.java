@@ -38,7 +38,7 @@ public class MethodExecutionTimingTransformer extends TimingTransformer {
         String name = method.getName();
         String signature = method.getSignature();
 
-        if (!isMatchSourceMethod(inputClass, false, name, signature)) {
+        if (!isMatchSourceMethod(inputClass, false, name, signature, method)) {
             return false;
         }
         String target = getTarget();

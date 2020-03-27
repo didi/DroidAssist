@@ -35,6 +35,15 @@
             </Target>
         </MethodExecution>
 
+        <MethodExecution>
+            <Source>
+                @com.didichuxing.tools.test.TestAnnotation
+            </Source>
+            <Target>
+                java.lang.System.out.println("test2,intValue=$intValue,strValue=$strValue");
+            </Target>
+        </MethodExecution>
+
         <ConstructorCall>
             <Source>new com.didichuxing.tools.test.ExampleSpec(int)</Source>
             <Target>{$_= com.didichuxing.tools.test.ExampleSpec.getInstance();}</Target>
@@ -85,6 +94,15 @@
             <Target>{java.lang.System.out.println("BeforeMethodExecution");}</Target>
         </AfterMethodExecution>
 
+        <BeforeMethodExecution>
+            <Source>@com.didichuxing.tools.test.TestAnnotation2</Source>
+            <Target>{java.lang.System.out.println("insert before by TestAnnotation2");}</Target>
+        </BeforeMethodExecution>
+
+        <AfterMethodExecution>
+            <Source>@com.didichuxing.tools.test.TestAnnotation2</Source>
+            <Target>{java.lang.System.out.println("insert after by TestAnnotation2");}</Target>
+        </AfterMethodExecution>
 
         <BeforeConstructorCall>
             <Source>new com.didichuxing.tools.test.ExampleSpec()</Source>
@@ -192,6 +210,15 @@
             </TargetAfter>
         </ConstructorExecution>
 
+        <ConstructorExecution>
+            <Source>@com.didichuxing.tools.test.TestAnnotation</Source>
+            <TargetBefore>
+                {java.lang.System.out.println("around before ConstructorExecution by Annotation");}
+            </TargetBefore>
+            <TargetAfter>
+                {java.lang.System.out.println("around after ConstructorExecution by Annotation");}
+            </TargetAfter>
+        </ConstructorExecution>
 
         <InitializerExecution>
             <Source>com.didichuxing.tools.test.ExampleSpec</Source>
@@ -239,6 +266,18 @@
             </Exception>
             <Target>
                 android.util.Log.d("test", "startActivity error", $e); return;
+            </Target>
+        </TryCatchMethodExecution>
+
+        <TryCatchMethodExecution>
+            <Source>
+                @com.didichuxing.tools.test.TestAnnotation3
+            </Source>
+            <Exception>
+                java.lang.Exception
+            </Exception>
+            <Target>
+                android.util.Log.d("test", "uncaught error by Annotation", $e); return;
             </Target>
         </TryCatchMethodExecution>
 

@@ -69,6 +69,12 @@ public class MainActivity extends Activity implements IInterface.Callback<String
         ExampleSpec test4 = new ExampleSpec(1, 2);
         test4.timing();
 
+        //Annotation test
+        ExampleSpec test5 = new ExampleSpec(1, 2, 3);
+        test5.test();
+        test5.test2();
+        test5.uncaught2();
+
         onCallback("");
 
         Child.main(null);

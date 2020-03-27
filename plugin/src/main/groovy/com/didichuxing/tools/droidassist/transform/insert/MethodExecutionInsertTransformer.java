@@ -37,7 +37,7 @@ public class MethodExecutionInsertTransformer extends InsertTransformer {
         String name = method.getName();
         String signature = method.getSignature();
 
-        if (!isMatchSourceMethod(inputClass, false, name, signature)) {
+        if (!isMatchSourceMethod(inputClass, false, name, signature, method)) {
             return false;
         }
 

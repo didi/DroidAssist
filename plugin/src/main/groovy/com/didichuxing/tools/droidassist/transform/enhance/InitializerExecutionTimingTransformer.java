@@ -43,7 +43,7 @@ public class InitializerExecutionTimingTransformer extends TimingTransformer {
                 initializer,
                 (source, result) -> {
                     String statement = "{" + getTimingStatement(source, target) + "}";
-                    statement = getReplaceStatement(initializer, statement);
+                    statement = getReplaceStatement(initializer, true, statement);
                     return statement;
                 });
 
