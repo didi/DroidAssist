@@ -1,5 +1,7 @@
 package com.didichuxing.tools.droidassist.util;
 
+import java.util.List;
+
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -10,6 +12,8 @@ import javassist.CtNewMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.bytecode.AccessFlag;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.BadBytecode;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.CodeIterator;
@@ -184,6 +188,14 @@ public class ClassUtils {
 
                 methodInfoCopy.setCodeAttribute(codeAttribute);
                 methodInfoCopy.rebuildStackMap(classPool);
+
+                //Copy the original annotation
+                List<AttributeInfo> attributes = methodInfo.getAttributes();
+                for (AttributeInfo attribute : attributes) {
+                    if (attribute instanceof AnnotationsAttribute) {
+                        methodInfoCopy.addAttribute(attribute);
+                    }
+                }
 
                 clazz.removeConstructor(constructor);
                 clazz.addConstructor(constructorCopy);

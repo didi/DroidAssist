@@ -44,6 +44,11 @@ public abstract class AroundTransformer extends ExprExecTransformer {
     }
 
     @Override
+    protected String getAnnotationTarget() {
+        return targetBefore + targetAfter;
+    }
+
+    @Override
     public String toString() {
         return getName() + "\n{" +
                 "\n    source='" + getSource() + '\'' +

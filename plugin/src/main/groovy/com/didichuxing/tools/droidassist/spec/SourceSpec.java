@@ -22,13 +22,19 @@ public class SourceSpec {
     private Kind kind;
     private String signature;
     private boolean extend;
+    private boolean annotation;
 
     public SourceSpec(Kind kind, Type type, Type declaring, String name, Type[] parameters) {
+        this(kind, type, declaring, name, parameters, false);
+    }
+
+    public SourceSpec(Kind kind, Type type, Type declaring, String name, Type[] parameters, boolean annotation) {
         this.kind = kind;
         this.type = type;
         this.declaring = declaring;
         this.name = name;
         this.parameters = parameters;
+        this.annotation = annotation;
         if (type != null) {
             if (kind == Kind.FIELD) {
                 this.signature = type.getErasureSignature();
@@ -45,6 +51,10 @@ public class SourceSpec {
 
     public boolean isExtend() {
         return extend;
+    }
+
+    public boolean isAnnotation() {
+        return annotation;
     }
 
     public Type getType() {
@@ -120,6 +130,8 @@ public class SourceSpec {
         SourceSpec sourceSpec;
         if (source.contains("/") || source.contains(";")) {
             sourceSpec = fromDescriptorPattern(source, kind);
+        } else if (source.startsWith("@")) {
+            sourceSpec = fromAnnotation(source, kind);
         } else {
             sourceSpec = fromJavaPattern(source, kind);
         }
@@ -162,6 +174,19 @@ public class SourceSpec {
                 Type.forSignature(signatureSig),
                 name,
                 (Type[]) ts[1]);
+    }
+
+    private static SourceSpec fromAnnotation(String source, String kind) {
+        source = source.substring(1);
+        int start = source.indexOf(".");
+        String name = source.substring(start < 0 ? 0 : (start + 1));
+        return new SourceSpec(
+                Kind.valueOf(kind),
+                Type.VOID,
+                Type.forName(source),
+                name,
+                Type.NONE
+                , true);
     }
 
     private static SourceSpec fromJavaPattern(String source, String kind) {

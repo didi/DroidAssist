@@ -35,7 +35,7 @@ public class ConstructorExecutionAroundTransformer extends AroundTransformer {
             CtConstructor constructor)
             throws CannotCompileException, NotFoundException {
 
-        if (!isMatchConstructorSource(inputClassName, constructor.getSignature())) {
+        if (!isMatchConstructorSource(inputClassName, constructor)) {
             return false;
         }
         String before = getTargetBefore();

@@ -1,14 +1,20 @@
 package com.didichuxing.tools.droidassist.transform;
 
 import com.didichuxing.tools.droidassist.ex.DroidAssistBadStatementException;
+import com.didichuxing.tools.droidassist.ex.DroidAssistException;
 import com.didichuxing.tools.droidassist.spec.SourceSpec;
 import com.didichuxing.tools.droidassist.util.ClassUtils;
 import com.didichuxing.tools.droidassist.util.Logger;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javassist.CannotCompileException;
+import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtMember;
@@ -17,6 +23,7 @@ import javassist.NotFoundException;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.Descriptor;
 import javassist.bytecode.MethodInfo;
+import javassist.bytecode.annotation.AnnotationImpl;
 import javassist.expr.FieldAccess;
 import javassist.expr.MethodCall;
 import javassist.expr.NewExpr;
@@ -31,6 +38,9 @@ public abstract class SourceTargetTransformer extends Transformer {
     private String sourceDeclaringClassName;
     private CtMember sourceMember;
     private CtClass sourceReturnType;
+
+    private Class annotationClass;
+    private Set<Method> annotationTargetMembers;
 
     public SourceTargetTransformer setSource(String source, String kind, boolean extend) {
         this.source = source;
@@ -85,7 +95,25 @@ public abstract class SourceTargetTransformer extends Transformer {
         return Descriptor.getReturnType(sourceSpec.getSignature(), classPool) == CtClass.voidType;
     }
 
+    private Class getAnnotationClass() {
+        if (annotationClass == null) {
+            try {
+                annotationClass = getSourceClass().toClass();
+            } catch (CannotCompileException | NotFoundException e) {
+                try {
+                    annotationClass = classPool.getClassLoader().loadClass(getSourceDeclaringClassName());
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        return annotationClass;
+    }
+
     boolean isMatchSourceClass(CtClass insnClass) throws NotFoundException {
+        if (sourceSpec.isAnnotation()) {
+            return true;
+        }
         boolean match = false;
         Boolean anInterface = isInterface(insnClass);
         if (anInterface == null || anInterface) {
@@ -127,7 +155,20 @@ public abstract class SourceTargetTransformer extends Transformer {
             String name,
             String signature)
             throws NotFoundException {
+        return isMatchSourceMethod(insnClass, checkClass, name, signature, null);
+    }
 
+    @SuppressWarnings("ConstantConditions")
+    protected boolean isMatchSourceMethod(
+            CtClass insnClass,
+            boolean checkClass,
+            String name,
+            String signature,
+            CtMethod method)
+            throws NotFoundException {
+        if (method != null && sourceSpec.isAnnotation()) {
+            return method.hasAnnotation(getSourceDeclaringClassName());
+        }
         boolean match = true;
         do {
             if (!name.equals(sourceSpec.getName())
@@ -175,6 +216,11 @@ public abstract class SourceTargetTransformer extends Transformer {
     protected boolean isMatchConstructorSource(String classname, String signature) {
         return classname.equals(getSourceDeclaringClassName())
                 && signature.equals(sourceSpec.getSignature());
+    }
+
+    protected boolean isMatchConstructorSource(String classname, CtConstructor constructor) {
+        return sourceSpec.isAnnotation() ? constructor.hasAnnotation(getSourceDeclaringClassName())
+                : isMatchConstructorSource(classname, constructor.getSignature());
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -225,6 +271,9 @@ public abstract class SourceTargetTransformer extends Transformer {
             CtConstructor constructor,
             boolean initializer,
             String statement) {
+        if (!initializer) {
+            statement = replaceAnnotationStatement(constructor, statement);
+        }
         MethodInfo methodInfo = constructor.getMethodInfo();
         int line = methodInfo.getLineNumber(0);
         String name = initializer ? "<clinit>" : "<init>";
@@ -235,6 +284,7 @@ public abstract class SourceTargetTransformer extends Transformer {
     }
 
     protected String getReplaceStatement(CtMethod method, String statement) {
+        statement = replaceAnnotationStatement(method, statement);
         MethodInfo methodInfo = method.getMethodInfo();
         int line = methodInfo.getLineNumber(0);
         String name = method.getName();
@@ -242,6 +292,27 @@ public abstract class SourceTargetTransformer extends Transformer {
         ClassFile classFile2 = method.getDeclaringClass().getClassFile2();
         String fileName = classFile2 == null ? null : classFile2.getSourceFile();
         return getReplaceStatement(statement, line, name, className, fileName);
+    }
+
+    private String replaceAnnotationStatement(CtBehavior behavior, String statement) {
+        if (!sourceSpec.isAnnotation() || annotationTargetMembers == null || annotationTargetMembers.isEmpty()) {
+            return statement;
+        }
+        try {
+            Object proxy = behavior.getAnnotation(getAnnotationClass());
+            if (proxy != null) {
+                AnnotationImpl impl = (AnnotationImpl) Proxy.getInvocationHandler(proxy);
+                for (Method member : annotationTargetMembers) {
+                    Object invoke = impl.invoke(proxy, member, null);
+                    statement = statement.replaceAll(
+                            Pattern.quote("$" + member.getName()), Matcher.quoteReplacement(invoke.toString()));
+                }
+            }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+            throw new DroidAssistException(throwable);
+        }
+        return statement;
     }
 
     protected String replaceInstrument(
@@ -354,6 +425,36 @@ public abstract class SourceTargetTransformer extends Transformer {
 
     @Override
     public void check() {
+        initAnnotationTargetMembers();
+    }
+
+    private void initAnnotationTargetMembers() {
+        if (!sourceSpec.isAnnotation()) {
+            return;
+        }
+        Method[] methods = getAnnotationClass().getDeclaredMethods();
+        if (methods.length == 0) {
+            return;
+        }
+        String target = getAnnotationTarget();
+        Pattern pattern = Pattern.compile("\\$([A-Za-z][A-Za-z0-9]*)[^A-Za-z0-9]?");
+        Matcher matcher = pattern.matcher(target);
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            for (Method method : methods) {
+                if (method.getName().equals(group)) {
+                    if (annotationTargetMembers == null) {
+                        annotationTargetMembers = new LinkedHashSet<>();
+                    }
+                    annotationTargetMembers.add(method);
+                    break;
+                }
+            }
+        }
+    }
+
+    protected String getAnnotationTarget() {
+        return target;
     }
 
     @Override

@@ -34,8 +34,7 @@ public class ConstructorExecutionInsertTransformer extends InsertTransformer {
             CtConstructor constructor)
             throws CannotCompileException, NotFoundException {
 
-        String signature = constructor.getSignature();
-        if (!isMatchConstructorSource(inputClassName, signature)) {
+        if (!isMatchConstructorSource(inputClassName, constructor)) {
             return false;
         }
         String target = getTarget();
