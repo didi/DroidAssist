@@ -51,7 +51,7 @@ class DirInputTask extends InputTask<DirectoryInput> {
                     }
                     if (status == Status.CHANGED || status == Status.ADDED) {
                         files << file
-                        if (destFile != null) {
+                        if (destFile != null && file.isFile()) {
                             executor.execute {
                                 FileUtils.copyFile(file, destFile)
                             }
