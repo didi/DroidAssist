@@ -1,4 +1,4 @@
-# DroidAssist ![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat) ![Release Version](https://img.shields.io/badge/release-1.1.0-blue.svg)
+# DroidAssist ![license](http://img.shields.io/badge/license-Apache2.0-brightgreen.svg?style=flat) ![Release Version](https://img.shields.io/badge/release-1.1.1-blue.svg)
 
 `DroidAssist` is a lightweight Android Studio gradle plugin based on Javassist for editing bytecode in Android. Unlike other AOP solutions, DroidAssist provides a more lightweight, easy-to-use, non-intrusive, configurable bytecode operation. Even without any Java bytecode knowledge, developers can modify a class file dynamically by editing xml plugin configuration only. You can use AOP-style functionality by adding simple Java code without introducing additional dependencies.
 
@@ -19,7 +19,7 @@ DroidAssist is available for application model or library model in Android Studi
 
 ```groovy
 dependencies {
-    classpath "com.didichuxing.tools:droidassist:1.1.0"
+    classpath "com.didichuxing.tools:droidassist:1.1.1"
 }
 ```
 
