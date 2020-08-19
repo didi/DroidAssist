@@ -35,7 +35,7 @@ public class InitializerExecutionInsertTransformer extends InsertTransformer {
 
         String target = getTarget();
 
-        target = getReplaceStatement(initializer, true, target);
+        target = getReplaceStatement(inputClassName, initializer, true, target);
         if (isAsBefore()) {
             initializer.insertBefore(target);
             Logger.warning(getPrettyName() + " insert after execution by: " + target

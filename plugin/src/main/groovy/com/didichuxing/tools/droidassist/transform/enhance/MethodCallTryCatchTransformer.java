@@ -47,7 +47,7 @@ public class MethodCallTryCatchTransformer extends TryCatchTransformer {
             return false;
         }
 
-        if (!isMatchSourceMethod(insnClass, insnName, insnSignature)) {
+        if (!isMatchSourceMethod(insnClass, insnName, insnSignature, false)) {
             return false;
         }
         String target = getTarget();
@@ -60,7 +60,7 @@ public class MethodCallTryCatchTransformer extends TryCatchTransformer {
                 target.replace("$e", "e") +
                 "}";
 
-        String replacement = replaceInstrument(methodCall, statement);
+        String replacement = replaceInstrument(inputClassName, methodCall, statement);
 
         Logger.warning(getPrettyName() + " by: " + replacement
                 + " at " + inputClassName + ".java" + ":" + methodCall.getLineNumber());

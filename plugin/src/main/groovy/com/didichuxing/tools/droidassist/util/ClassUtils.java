@@ -89,6 +89,28 @@ public class ClassUtils {
                 " not found in class " + ctClass.getName());
     }
 
+    public static CtMethod getMethod(
+            CtClass ctClass,
+            String name,
+            String signature)
+            throws NotFoundException {
+
+        for (CtMethod method : ctClass.getDeclaredMethods()) {
+            if (method.getName().equals(name)
+                    && method.getSignature().equals(signature)) {
+                return method;
+            }
+        }
+
+        for (CtMethod method : ctClass.getMethods()) {
+            if (method.getName().equals(name)
+                    && method.getSignature().equals(signature)) {
+                return method;
+            }
+        }
+        throw new NotFoundException("Method " + name + signature +
+                " not found in class " + ctClass.getName());
+    }
 
     public static DelegateResult newMethodDelegate(
             CtClass clazz,

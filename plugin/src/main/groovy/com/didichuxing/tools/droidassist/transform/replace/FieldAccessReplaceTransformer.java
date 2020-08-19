@@ -51,7 +51,7 @@ public class FieldAccessReplaceTransformer extends ReplaceTransformer {
         }
 
         String target = getTarget();
-        String replacement = replaceInstrument(fieldAccess, target);
+        String replacement = replaceInstrument(inputClassName, fieldAccess, target);
 
         Logger.warning(getPrettyName() + " by: " +
                 (fieldAccess.isWriter() ? " write" : " read") + replacement + " at " +

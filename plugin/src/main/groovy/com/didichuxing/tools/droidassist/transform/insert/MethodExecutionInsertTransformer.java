@@ -37,12 +37,12 @@ public class MethodExecutionInsertTransformer extends InsertTransformer {
         String name = method.getName();
         String signature = method.getSignature();
 
-        if (!isMatchSourceMethod(inputClass, false, name, signature, method)) {
+        if (!isMatchSourceMethod(inputClass, false, name, signature, method, true)) {
             return false;
         }
 
         String target = getTarget();
-        target = getReplaceStatement(method, target);
+        target = getReplaceStatement(inputClassName, method, target);
         if (isAsBefore()) {
             method.insertBefore(target);
             Logger.warning(getPrettyName() + " by before: " + target

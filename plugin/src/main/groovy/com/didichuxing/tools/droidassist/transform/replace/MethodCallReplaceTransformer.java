@@ -49,12 +49,12 @@ public class MethodCallReplaceTransformer extends ReplaceTransformer {
             return false;
         }
 
-        if (!isMatchSourceMethod(insnClass, insnName, insnSignature)) {
+        if (!isMatchSourceMethod(insnClass, insnName, insnSignature, false)) {
             return false;
         }
 
         String target = getTarget();
-        String replacement = replaceInstrument(methodCall, target);
+        String replacement = replaceInstrument(inputClassName, methodCall, target);
         Logger.warning(getPrettyName() + " by: " + replacement
                 + " at " + inputClassName + ".java" + ":" + methodCall.getLineNumber());
         return true;

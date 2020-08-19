@@ -59,7 +59,7 @@ public class FieldAccessInsertTransformer extends InsertTransformer {
                 + (isAsAfter() ? target : "")
                 + "}";
 
-        String replacement = replaceInstrument(fieldAccess, statement);
+        String replacement = replaceInstrument(inputClassName, fieldAccess, statement);
 
         Logger.warning(getPrettyName() + " by: " + replacement
                 + " at " + inputClassName + ".java" + ":" + fieldAccess.getLineNumber());

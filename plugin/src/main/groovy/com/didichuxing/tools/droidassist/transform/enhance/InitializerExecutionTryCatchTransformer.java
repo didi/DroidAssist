@@ -46,7 +46,7 @@ public class InitializerExecutionTryCatchTransformer extends TryCatchTransformer
                             "} catch (" + getException() + " e) {"
                             + target.replace("$e", "e")
                             + "}";
-                    statement = getReplaceStatement(initializer, true, statement);
+                    statement = getReplaceStatement(inputClassName, initializer, true, statement);
                     return statement;
                 }
         );

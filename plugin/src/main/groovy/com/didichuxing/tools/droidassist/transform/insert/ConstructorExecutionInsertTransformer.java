@@ -40,7 +40,7 @@ public class ConstructorExecutionInsertTransformer extends InsertTransformer {
         String target = getTarget();
         String name = constructor.getName();
 
-        target = getReplaceStatement(constructor, target);
+        target = getReplaceStatement(inputClassName, constructor, target);
 
         if (isAsBefore()) {
             constructor.insertBeforeBody(target);

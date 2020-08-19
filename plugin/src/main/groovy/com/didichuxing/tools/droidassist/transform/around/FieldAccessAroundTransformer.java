@@ -56,7 +56,7 @@ public class FieldAccessAroundTransformer extends AroundTransformer {
 
         String proceed = fieldAccess.isWriter() ? "$proceed($$);" : "$_=$proceed($$);";
         String statement = "{" + before + proceed + after + "}";
-        String replacement = replaceInstrument(fieldAccess, statement);
+        String replacement = replaceInstrument(inputClassName, fieldAccess, statement);
 
         Logger.warning(getPrettyName() + " by: " + replacement
                 + " at " + inputClassName + ".java" + ":" + fieldAccess.getLineNumber());

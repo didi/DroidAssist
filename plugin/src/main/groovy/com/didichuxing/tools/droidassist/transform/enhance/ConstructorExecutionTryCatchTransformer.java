@@ -50,7 +50,7 @@ public class ConstructorExecutionTryCatchTransformer extends TryCatchTransformer
                     String statement = "try{" + source + "} catch (" + getException() + " e) {"
                             + targetStatement.replace("$e", "e") + "}";
 
-                    return getReplaceStatement((CtConstructor) result.getSource(), statement);
+                    return getReplaceStatement(inputClassName, (CtConstructor) result.getSource(), statement);
                 });
 
         Logger.warning(getPrettyName() + " by: " + target

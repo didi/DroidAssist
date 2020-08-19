@@ -45,7 +45,7 @@ public class MethodCallInsertTransformer extends InsertTransformer {
         if (insnClass == null) {
             return false;
         }
-        if (!isMatchSourceMethod(insnClass, insnName, insnSignature)) {
+        if (!isMatchSourceMethod(insnClass, insnName, insnSignature, false)) {
             return false;
         }
 
@@ -60,7 +60,7 @@ public class MethodCallInsertTransformer extends InsertTransformer {
 
         String statement = before + proceed + after;
 
-        String replacement = replaceInstrument(methodCall, statement);
+        String replacement = replaceInstrument(inputClassName, methodCall, statement);
 
         if (isAsBefore()) {
             Logger.warning(getPrettyName() + " insert before call by: " + replacement

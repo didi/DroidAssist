@@ -47,7 +47,7 @@ public class ConstructorExecutionAroundTransformer extends AroundTransformer {
                 constructor,
                 (source, result) -> {
                     String body = "{" + before + source + after + "}";
-                    return getReplaceStatement((CtConstructor) result.getSource(), body);
+                    return getReplaceStatement(inputClassName, (CtConstructor) result.getSource(), body);
                 }
         );
 

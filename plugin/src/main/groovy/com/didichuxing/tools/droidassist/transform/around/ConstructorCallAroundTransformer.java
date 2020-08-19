@@ -50,7 +50,7 @@ public class ConstructorCallAroundTransformer extends AroundTransformer {
         String after = getTargetAfter();
         // "$_=$proceed($$);" represents the original method body
         String statement = "{" + before + "$_=$proceed($$);" + after + "}";
-        String replacement = replaceInstrument(expr, statement);
+        String replacement = replaceInstrument(inputClassName, expr, statement);
 
         Logger.warning(getPrettyName() + " by: " + replacement
                 + " at " + inputClassName + ".java" + ":" + expr.getLineNumber());

@@ -72,14 +72,14 @@ public abstract class SourceTargetTransformer extends Transformer {
         return sourceClass;
     }
 
-    private CtMember getSourceMember() throws NotFoundException {
-        if (sourceMember == null) {
-            CtClass sourceClass = getSourceClass();
-            String name = sourceSpec.getName();
-            String signature = sourceSpec.getSignature();
-            if (sourceSpec.getKind() == SourceSpec.Kind.METHOD) {
-                sourceMember = ClassUtils.getDeclaredMethod(sourceClass, name, signature);
-            }
+    private CtMember getSourceMember(boolean declared) throws NotFoundException {
+        CtMember sourceMember = null;
+        CtClass sourceClass = getSourceClass();
+        String name = sourceSpec.getName();
+        String signature = sourceSpec.getSignature();
+        if (sourceSpec.getKind() == SourceSpec.Kind.METHOD) {
+            sourceMember = declared ? ClassUtils.getDeclaredMethod(sourceClass, name, signature)
+                    : ClassUtils.getMethod(sourceClass, name, signature);
         }
         return sourceMember;
     }
@@ -143,19 +143,10 @@ public abstract class SourceTargetTransformer extends Transformer {
     protected boolean isMatchSourceMethod(
             CtClass insnClass,
             String name,
-            String signature)
+            String signature,
+            boolean declared)
             throws NotFoundException {
-        return isMatchSourceMethod(insnClass, true, name, signature);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    protected boolean isMatchSourceMethod(
-            CtClass insnClass,
-            boolean checkClass,
-            String name,
-            String signature)
-            throws NotFoundException {
-        return isMatchSourceMethod(insnClass, checkClass, name, signature, null);
+        return isMatchSourceMethod(insnClass, true, name, signature, declared);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -164,7 +155,19 @@ public abstract class SourceTargetTransformer extends Transformer {
             boolean checkClass,
             String name,
             String signature,
-            CtMethod method)
+            boolean declared)
+            throws NotFoundException {
+        return isMatchSourceMethod(insnClass, checkClass, name, signature, null, declared);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    protected boolean isMatchSourceMethod(
+            CtClass insnClass,
+            boolean checkClass,
+            String name,
+            String signature,
+            CtMethod method,
+            boolean declared)
             throws NotFoundException {
         if (method != null && sourceSpec.isAnnotation()) {
             return method.hasAnnotation(getSourceDeclaringClassName());
@@ -200,7 +203,7 @@ public abstract class SourceTargetTransformer extends Transformer {
             }
 
             if (sourceSpec.getKind() == SourceSpec.Kind.METHOD) {
-                CtMember member = getSourceMember();
+                CtMember member = getSourceMember(declared);
                 boolean visible = member.visibleFrom(insnClass);
                 if (!visible) {
                     match = false;
@@ -239,15 +242,17 @@ public abstract class SourceTargetTransformer extends Transformer {
         return "ReplaceTransformer";
     }
 
-    protected String getReplaceStatement(MethodCall methodCall, String statement) {
+    protected String getReplaceStatement(
+            String sourceClassName,
+            MethodCall methodCall,
+            String statement) {
         int line = methodCall.getLineNumber();
         String name = methodCall.getMethodName();
-        String className = methodCall.getClassName();
         String fileName = methodCall.getFileName();
-        return getReplaceStatement(statement, line, name, className, fileName);
+        return getReplaceStatement(statement, line, name, sourceClassName, fileName);
     }
 
-    protected String getReplaceStatement(NewExpr expr, String statement) {
+    protected String getReplaceStatement(String sourceClassName, NewExpr expr, String statement) {
         int line = expr.getLineNumber();
         String name = "<init>";
         String className = expr.getClassName();
@@ -255,7 +260,7 @@ public abstract class SourceTargetTransformer extends Transformer {
         return getReplaceStatement(statement, line, name, className, fileName);
     }
 
-    protected String getReplaceStatement(FieldAccess fieldAccess, String statement) {
+    protected String getReplaceStatement(String sourceClassName, FieldAccess fieldAccess, String statement) {
         int line = fieldAccess.getLineNumber();
         String name = fieldAccess.getFieldName();
         String className = fieldAccess.getClassName();
@@ -263,11 +268,12 @@ public abstract class SourceTargetTransformer extends Transformer {
         return getReplaceStatement(statement, line, name, className, fileName);
     }
 
-    protected String getReplaceStatement(CtConstructor constructor, String statement) {
-        return getReplaceStatement(constructor, false, statement);
+    protected String getReplaceStatement(String sourceClassName, CtConstructor constructor, String statement) {
+        return getReplaceStatement(sourceClassName, constructor, false, statement);
     }
 
     protected String getReplaceStatement(
+            String sourceClassName,
             CtConstructor constructor,
             boolean initializer,
             String statement) {
@@ -277,21 +283,19 @@ public abstract class SourceTargetTransformer extends Transformer {
         MethodInfo methodInfo = constructor.getMethodInfo();
         int line = methodInfo.getLineNumber(0);
         String name = initializer ? "<clinit>" : "<init>";
-        String className = constructor.getDeclaringClass().getName();
         ClassFile classFile2 = constructor.getDeclaringClass().getClassFile2();
         String fileName = classFile2 == null ? null : classFile2.getSourceFile();
-        return getReplaceStatement(statement, line, name, className, fileName);
+        return getReplaceStatement(statement, line, name, sourceClassName, fileName);
     }
 
-    protected String getReplaceStatement(CtMethod method, String statement) {
+    protected String getReplaceStatement(String sourceClassName, CtMethod method, String statement) {
         statement = replaceAnnotationStatement(method, statement);
         MethodInfo methodInfo = method.getMethodInfo();
         int line = methodInfo.getLineNumber(0);
         String name = method.getName();
-        String className = method.getDeclaringClass().getName();
         ClassFile classFile2 = method.getDeclaringClass().getClassFile2();
         String fileName = classFile2 == null ? null : classFile2.getSourceFile();
-        return getReplaceStatement(statement, line, name, className, fileName);
+        return getReplaceStatement(statement, line, name, sourceClassName, fileName);
     }
 
     private String replaceAnnotationStatement(CtBehavior behavior, String statement) {
@@ -316,10 +320,11 @@ public abstract class SourceTargetTransformer extends Transformer {
     }
 
     protected String replaceInstrument(
+            String sourceClassName,
             CtMethod method,
             String statement)
             throws CannotCompileException {
-        String replacement = getReplaceStatement(method, statement);
+        String replacement = getReplaceStatement(sourceClassName, method, statement);
         try {
             String s = replacement.replaceAll("\n", "");
             method.setBody(s);
@@ -332,10 +337,11 @@ public abstract class SourceTargetTransformer extends Transformer {
     }
 
     protected String replaceInstrument(
+            String sourceClassName,
             MethodCall methodCall,
             String statement)
             throws CannotCompileException {
-        String replacement = getReplaceStatement(methodCall, statement);
+        String replacement = getReplaceStatement(sourceClassName, methodCall, statement);
         try {
             String s = replacement.replaceAll("\n", "");
             methodCall.replace(s);
@@ -348,10 +354,11 @@ public abstract class SourceTargetTransformer extends Transformer {
     }
 
     protected String replaceInstrument(
+            String sourceClassName,
             NewExpr expr,
             String statement)
             throws CannotCompileException {
-        String replacement = getReplaceStatement(expr, statement);
+        String replacement = getReplaceStatement(sourceClassName, expr, statement);
         try {
             String s = replacement.replaceAll("\n", "");
             expr.replace(s);
@@ -364,10 +371,11 @@ public abstract class SourceTargetTransformer extends Transformer {
     }
 
     protected String replaceInstrument(
+            String sourceClassName,
             FieldAccess fieldAccess,
             String statement)
             throws CannotCompileException {
-        String replacement = getReplaceStatement(fieldAccess, statement);
+        String replacement = getReplaceStatement(sourceClassName, fieldAccess, statement);
         try {
             String s = replacement.replaceAll("\n", "");
             fieldAccess.replace(s);
@@ -380,10 +388,11 @@ public abstract class SourceTargetTransformer extends Transformer {
     }
 
     protected String replaceInstrument(
+            String sourceClassName,
             CtConstructor constructor,
             String statement)
             throws CannotCompileException {
-        String replacement = getReplaceStatement(constructor, statement);
+        String replacement = getReplaceStatement(sourceClassName, constructor, statement);
         try {
             String s = replacement.replaceAll("\n", "");
             constructor.setBody(s);

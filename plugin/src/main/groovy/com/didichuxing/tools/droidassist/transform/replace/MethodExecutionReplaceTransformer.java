@@ -36,11 +36,11 @@ public class MethodExecutionReplaceTransformer extends ReplaceTransformer {
         String name = method.getName();
         String signature = method.getSignature();
 
-        if (!isMatchSourceMethod(inputClass, false, name, signature, method)) {
+        if (!isMatchSourceMethod(inputClass, false, name, signature, method, true)) {
             return false;
         }
         String target = getTarget();
-        target = getReplaceStatement(method, target);
+        target = getReplaceStatement(inputClassName, method, target);
         method.setBody(target);
         Logger.warning(getPrettyName() + " by: " + target
                 + " at " + inputClassName + ".java" + ":" + name);

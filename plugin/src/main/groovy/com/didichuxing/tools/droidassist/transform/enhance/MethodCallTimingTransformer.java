@@ -47,13 +47,13 @@ public class MethodCallTimingTransformer extends TimingTransformer {
             return false;
         }
 
-        if (!isMatchSourceMethod(insnClass, insnName, insnSignature)) {
+        if (!isMatchSourceMethod(insnClass, insnName, insnSignature, false)) {
             return false;
         }
 
         String target = getTarget();
         String statement = getDefaultTimingStatement(isVoidSourceReturnType(), target);
-        String replacement = replaceInstrument(methodCall, statement);
+        String replacement = replaceInstrument(inputClassName, methodCall, statement);
 
         Logger.warning(getPrettyName() + " by: " + replacement
                 + " at " + inputClassName + ".java" + ":" + methodCall.getLineNumber());

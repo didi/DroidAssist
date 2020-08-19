@@ -38,7 +38,7 @@ public class MethodExecutionAroundTransformer extends AroundTransformer {
         String name = method.getName();
         String signature = method.getSignature();
 
-        if (!isMatchSourceMethod(inputClass, false, name, signature, method)) {
+        if (!isMatchSourceMethod(inputClass, false, name, signature, method, true)) {
             return false;
         }
         String before = getTargetBefore();
@@ -49,7 +49,7 @@ public class MethodExecutionAroundTransformer extends AroundTransformer {
                 method,
                 (source, result) -> {
                     String body = "{" + before + source + after + "}";
-                    return getReplaceStatement((CtMethod) result.getSource(), body);
+                    return getReplaceStatement(inputClassName, (CtMethod) result.getSource(), body);
                 });
 
         Logger.warning(getPrettyName() + " by: " + before + " $proceed($$) "

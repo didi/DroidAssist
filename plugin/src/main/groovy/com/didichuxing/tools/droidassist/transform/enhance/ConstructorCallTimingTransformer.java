@@ -47,7 +47,7 @@ public class ConstructorCallTimingTransformer extends TimingTransformer {
         }
 
         String statement = getDefaultTimingStatement(false, getTarget());
-        String replacement = replaceInstrument(expr, statement);
+        String replacement = replaceInstrument(inputClassName, expr, statement);
 
         Logger.warning(getPrettyName() + " by: " + replacement
                 + " at " + inputClassName + ".java" + ":" + expr.getLineNumber());

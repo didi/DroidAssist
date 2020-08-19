@@ -53,7 +53,7 @@ public class ConstructorCallInsertTransformer extends InsertTransformer {
         String before = isAsBefore() ? target : "";
         String after = isAsAfter() ? target : "";
         String statement = "{" + before + "$_=$proceed($$);" + after + "}";
-        String replacement = replaceInstrument(newExpr, statement);
+        String replacement = replaceInstrument(inputClassName, newExpr, statement);
 
         if (isAsBefore()) {
             Logger.warning(getPrettyName() + " by before: " + replacement

@@ -38,7 +38,7 @@ public class MethodExecutionTryCatchTransformer extends TryCatchTransformer {
         String name = method.getName();
         String signature = method.getSignature();
 
-        if (!isMatchSourceMethod(inputClass, false, name, signature, method)) {
+        if (!isMatchSourceMethod(inputClass, false, name, signature, method, true)) {
             return false;
         }
         String target = getTarget();
@@ -88,7 +88,7 @@ public class MethodExecutionTryCatchTransformer extends TryCatchTransformer {
                                 "but found: " + target);
             }
         }
-        target = getReplaceStatement(method, builder.toString());
+        target = getReplaceStatement(clazz.getName(), method, builder.toString());
         srcMethod.addCatch(target, exceptionType);
     }
 }

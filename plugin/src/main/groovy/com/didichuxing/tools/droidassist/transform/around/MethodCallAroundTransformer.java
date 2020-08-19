@@ -47,7 +47,7 @@ public class MethodCallAroundTransformer extends AroundTransformer {
             return false;
         }
 
-        if (!isMatchSourceMethod(insnClass, insnName, insnSignature)) {
+        if (!isMatchSourceMethod(insnClass, insnName, insnSignature, false)) {
             return false;
         }
         String before = getTargetBefore();
@@ -59,7 +59,7 @@ public class MethodCallAroundTransformer extends AroundTransformer {
         String proceed = isVoidSourceReturnType() ? "$proceed($$);" : "$_ =$proceed($$);";
         String statement = "{" + before + proceed + after + "}";
 
-        replaceInstrument(methodCall, statement);
+        replaceInstrument(inputClassName, methodCall, statement);
 
         return true;
     }

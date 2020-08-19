@@ -34,7 +34,7 @@ public class InitializerExecutionReplaceTransformer extends ReplaceTransformer {
             throws CannotCompileException, NotFoundException {
 
         String target = getTarget();
-        target = getReplaceStatement(constructor, true, target);
+        target = getReplaceStatement(inputClassName, constructor, true, target);
         constructor.setBody(target);
         Logger.warning(getPrettyName() + " replaced execution by: " + target
                 + " at " + inputClassName + ".java" + ":" + constructor.getName());

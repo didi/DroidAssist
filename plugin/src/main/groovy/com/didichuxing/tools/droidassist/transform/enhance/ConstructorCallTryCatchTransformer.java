@@ -50,7 +50,7 @@ public class ConstructorCallTryCatchTransformer extends TryCatchTransformer {
         String statement = "try{" + proceed + "} catch (" + getException() + " e) {"
                 + getTarget().replace("$e", "e") + "}";
 
-        String replacement = replaceInstrument(expr, statement);
+        String replacement = replaceInstrument(inputClassName, expr, statement);
 
         Logger.warning(getPrettyName() + " by: " + replacement
                 + " at " + inputClassName + ".java" + ":" + expr.getLineNumber());

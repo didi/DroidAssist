@@ -48,7 +48,7 @@ public class ConstructorExecutionTimingTransformer extends TimingTransformer {
                 constructor,
                 (source, result) -> {
                     String statement = "{" + getTimingStatement(source, target) + "}";
-                    statement = getReplaceStatement((CtConstructor) result.getSource(), statement);
+                    statement = getReplaceStatement(inputClassName, (CtConstructor) result.getSource(), statement);
                     return statement;
                 });
 

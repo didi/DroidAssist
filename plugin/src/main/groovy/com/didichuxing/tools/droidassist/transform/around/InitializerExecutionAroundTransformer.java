@@ -43,7 +43,7 @@ public class InitializerExecutionAroundTransformer extends AroundTransformer {
                 initializer,
                 (source, result) -> {
                     String body = "{" + before + source + after + "}";
-                    return getReplaceStatement(initializer, true, body);
+                    return getReplaceStatement(inputClassName, initializer, true, body);
                 }
         );
         Logger.warning(getPrettyName() + " by: " + before + " $proceed($$) " + after

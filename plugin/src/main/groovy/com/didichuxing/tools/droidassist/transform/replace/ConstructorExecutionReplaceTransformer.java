@@ -38,7 +38,7 @@ public class ConstructorExecutionReplaceTransformer extends ReplaceTransformer {
             return false;
         }
         String target = getTarget();
-        replaceInstrument(constructor, target);
+        replaceInstrument(inputClassName, constructor, target);
         Logger.warning(getPrettyName() + " replaced execution by: " + target
                 + " at " + inputClassName + ".java" + ":" + constructor.getName());
         return true;
