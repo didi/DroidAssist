@@ -41,14 +41,16 @@ class JarInputTask extends InputTask<JarInput> {
             }
         }
 
-        def written = false
-        ZipUtils.collectAllClassesFromJar(inputJar).forEach {
-            written = executeClass(it, temporaryDir) || written
-        }
-        if (written) {
-            ZipUtils.zipAppend(inputJar, taskInput.dest, temporaryDir)
-        } else {
-            FileUtils.copyFile(inputJar, taskInput.dest)
+        if (input.status != Status.REMOVED) {
+            def written = false
+            ZipUtils.collectAllClassesFromJar(inputJar).forEach {
+                written = executeClass(it, temporaryDir) || written
+            }
+            if (written) {
+                ZipUtils.zipAppend(inputJar, taskInput.dest, temporaryDir)
+            } else {
+                FileUtils.copyFile(inputJar, taskInput.dest)
+            }
         }
     }
 }
